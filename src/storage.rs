@@ -13,6 +13,7 @@ pub struct Accounts {
 pub struct Account {
     pub name: String,
     pub key: String,
+    pub totp: bool,
     pub hash_function: String,
     pub counter: Option<u64>,
 }

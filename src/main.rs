@@ -94,29 +94,7 @@ fn add_account(_account_name: &str, _secret_key: &str, _counter: u64) {}
 fn view_account(account_name: &str, length: usize) {
     match storage::get(account_name) {
         Ok(Some(account)) => {
-            let decoded_key = BASE32_NOPAD.decode(account.key.as_bytes()).unwrap();
-            let hash_function = match account.hash_function.as_ref() {
-                "SHA1" => otp::HashFunction::SHA1,
-                "SHA256" => otp::HashFunction::SHA256,
-                "SHA384" => otp::HashFunction::SHA384,
-                "SHA512" => otp::HashFunction::SHA512,
-                "SHA512_256" => otp::HashFunction::SHA512_256,
-                _ => otp::HashFunction::SHA1,
-            };
-            if let Some(counter) = account.counter {
-                // if counter has a value, use HOTP
-                let otp = otp::OTP::new(
-                    decoded_key,
-                    false,
-                    hash_function,
-                    Some(counter),
-                    Some(length),
-                );
-                println!("Account: {}\nHOTP: {}", account_name, otp.generate());
-            } else {
-                let otp = otp::OTP::new(decoded_key, true, hash_function, None, Some(length));
-                println!("Account: {}\nTOTP: {}", account_name, otp.generate());
-            }
+            print_otp_code(&account, Some(length));
         }
         Ok(None) => println!(
             "Account with the name {} does not exist. Consider adding it.",
@@ -130,26 +108,35 @@ fn list_accounts() {
     match storage::list() {
         Ok(accounts) => {
             for account in accounts {
-                let decoded_key = BASE32_NOPAD.decode(account.key.as_bytes()).unwrap();
-                let hash_function = match account.hash_function.as_ref() {
-                    "SHA1" => otp::HashFunction::SHA1,
-                    "SHA256" => otp::HashFunction::SHA256,
-                    "SHA384" => otp::HashFunction::SHA384,
-                    "SHA512" => otp::HashFunction::SHA512,
-                    "SHA512_256" => otp::HashFunction::SHA512_256,
-                    _ => otp::HashFunction::SHA1,
-                };
-                if let Some(counter) = account.counter {
-                    // if counter has a value, use HOTP
-                    let otp = otp::OTP::new(decoded_key, false, hash_function, Some(counter), None);
-                    println!("Account: {}\nHOTP: {}", account.name, otp.generate());
-                } else {
-                    let otp = otp::OTP::new(decoded_key, true, hash_function, None, None);
-                    println!("Account: {}\nTOTP: {}", account.name, otp.generate());
-                }
+                print_otp_code(&account, None);
                 println!("\n");
             }
         }
         Err(err) => println!("Error {}", err),
     };
+}
+
+fn print_otp_code(account: &storage::Account, code_length: Option<usize>) {
+    let decoded_key = BASE32_NOPAD.decode(account.key.as_bytes()).unwrap();
+    let hash_function = match account.hash_function.as_ref() {
+        "SHA1" => otp::HashFunction::SHA1,
+        "SHA256" => otp::HashFunction::SHA256,
+        "SHA384" => otp::HashFunction::SHA384,
+        "SHA512" => otp::HashFunction::SHA512,
+        "SHA512_256" => otp::HashFunction::SHA512_256,
+        _ => otp::HashFunction::SHA1,
+    };
+    let otp = otp::OTP::new(
+        decoded_key,
+        account.totp,
+        hash_function,
+        account.counter,
+        code_length,
+    );
+
+    if account.totp {
+        println!("Account: {}\nTOTP: {}", account.name, otp.generate());
+    } else {
+        println!("Account: {}\nHOTP: {}", account.name, otp.generate());
+    }
 }
