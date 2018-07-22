@@ -83,7 +83,7 @@ fn run(matches: &ArgMatches) {
             };
             view_account(sub_m.value_of("account").unwrap(), length)
         }
-        ("list", Some(_sub_m)) => list_accounts(),
+        ("list", Some(_)) => list_accounts(),
         ("edit", Some(_sub_m)) => {}
         _ => println!("No subcommand chosen"),
     }
