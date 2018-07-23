@@ -118,7 +118,6 @@ fn list_accounts() {
 
 fn print_otp_code(account: &storage::Account, code_length: Option<usize>) {
     let decoded_key = BASE32_NOPAD.decode(account.key.as_bytes()).unwrap();
-    println!("{:?}", decoded_key);
     let hash_function = match account.hash_function.as_ref() {
         "SHA1" => otp::HashFunction::SHA1,
         "SHA256" => otp::HashFunction::SHA256,
