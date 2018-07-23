@@ -1,3 +1,4 @@
+use open;
 use std::error::Error;
 use std::fs;
 use toml;
@@ -34,4 +35,11 @@ pub fn list() -> Result<Vec<Account>, Box<Error>> {
     let accounts_toml = fs::read_to_string(FILE_PATH).expect("Unable to read file");
     let accounts: Accounts = toml::from_str(&accounts_toml).unwrap();
     Ok(accounts.accounts.unwrap_or(vec![]))
+}
+
+pub fn open_recovery_codes(account_name: &str) {
+    match open::that("/home/evans/.2fa") {
+        Ok(_) => {}
+        Err(err) => println!("Error {}", err),
+    };
 }

@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate clap;
 extern crate data_encoding;
+extern crate open;
 extern crate ring;
 extern crate serde;
 #[macro_use]
@@ -48,12 +49,6 @@ fn main() {
                         .takes_value(true)
                         .value_name("NUMBER")
                         .help("Length of the OTP"),
-                )
-                .arg(
-                    Arg::with_name("recovery_codes")
-                        .short("rc")
-                        .long("recovery_codes")
-                        .help("Open editor and view your recovery codes"),
                 ),
         )
         .subcommand(SubCommand::with_name("list").about("List OTP for all accounts"))
@@ -63,6 +58,15 @@ fn main() {
                     .required(true)
                     .help("Name of the account"),
             ),
+        )
+        .subcommand(
+            SubCommand::with_name("recovery_codes")
+                .about("View recovery codes for an account")
+                .arg(
+                    Arg::with_name("account")
+                        .required(true)
+                        .help("Name of the account"),
+                ),
         )
         .get_matches();
 
@@ -85,8 +89,13 @@ fn run(matches: &ArgMatches) {
         }
         ("list", Some(_)) => list_accounts(),
         ("edit", Some(_sub_m)) => {}
+        ("recovery_codes", Some(sub_m)) => view_recovery_codes(sub_m.value_of("account").unwrap()),
         _ => println!("No subcommand chosen"),
     }
+}
+
+fn view_recovery_codes(account_name: &str) {
+    storage::open_recovery_codes(account_name);
 }
 
 fn add_account(_account_name: &str, _secret_key: &str, _counter: u64) {}
