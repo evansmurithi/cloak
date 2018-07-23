@@ -98,3 +98,53 @@ impl OTP {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{HashFunction, OTP};
+
+    macro_rules! test_hotp_hash_fn {
+        ($func:ident, $hf:expr, $c:tt) => {
+            #[test]
+            fn $func() {
+                let decoded_key = vec![
+                    224, 50, 146, 192, 168, 54, 25, 165, 50, 110, 119, 244, 143, 20, 14, 207, 178,
+                    91, 38, 62,
+                ];
+                let hotp = OTP::new(decoded_key, false, $hf, None, None);
+                assert_eq!(hotp.generate(), $c);
+            }
+        };
+    }
+
+    test_hotp_hash_fn!(test_sha1, HashFunction::SHA1, "852241");
+    test_hotp_hash_fn!(test_sha256, HashFunction::SHA256, "851154");
+    test_hotp_hash_fn!(test_sha384, HashFunction::SHA384, "607946");
+    test_hotp_hash_fn!(test_sha512, HashFunction::SHA512, "377017");
+    test_hotp_hash_fn!(test_sha512_256, HashFunction::SHA512_256, "171117");
+
+    #[test]
+    fn test_hotp_default() {
+        let decoded_key = vec![
+            224, 50, 146, 192, 168, 54, 25, 165, 50, 110, 119, 244, 143, 20, 14, 207, 178, 91, 38,
+            62,
+        ];
+        let hotp = OTP::new(decoded_key, false, HashFunction::SHA1, None, None);
+        assert_eq!(hotp.counter, 0);
+        let code = hotp.generate();
+        assert_eq!(code.len(), 6);
+        assert_eq!(code, "852241");
+    }
+
+    #[test]
+    fn test_hotp_given_counter_and_length() {
+        let decoded_key = vec![
+            224, 50, 146, 192, 168, 54, 25, 165, 50, 110, 119, 244, 143, 20, 14, 207, 178, 91, 38,
+            62,
+        ];
+        let hotp = OTP::new(decoded_key, false, HashFunction::SHA1, Some(1), Some(8));
+        let code = hotp.generate();
+        assert_eq!(code.len(), 8);
+        assert_eq!(code, "34863669");
+    }
+}
