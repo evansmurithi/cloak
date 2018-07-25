@@ -29,7 +29,7 @@ fn main() {
                         .help("Name of the account"),
                 )
                 .arg(
-                    Arg::with_name("secret_key")
+                    Arg::with_name("key")
                         .required(true)
                         .help("Secret key of the OTP"),
                 )
@@ -78,7 +78,7 @@ fn run(matches: &ArgMatches) {
     match matches.subcommand() {
         ("add", Some(sub_m)) => add_account(
             sub_m.value_of("account").unwrap(),
-            sub_m.value_of("secret_key").unwrap(),
+            sub_m.value_of("key").unwrap(),
             sub_m.value_of("counter").unwrap().parse::<u64>().unwrap(),
         ),
         ("view", Some(sub_m)) => {
@@ -102,7 +102,7 @@ fn view_recovery_codes(account_name: &str) {
     };
 }
 
-fn add_account(_account_name: &str, _secret_key: &str, _counter: u64) {}
+fn add_account(_account_name: &str, _key: &str, _counter: u64) {}
 
 fn view_account(account_name: &str, length: usize) {
     match storage::get(account_name) {

@@ -12,7 +12,7 @@ pub enum HashFunction {
 
 #[derive(Debug)]
 pub struct OTP {
-    secret_key: Vec<u8>,
+    key: Vec<u8>,
     counter: u64,
     totp: bool,
     output_len: usize,
@@ -22,7 +22,7 @@ pub struct OTP {
 
 impl OTP {
     pub fn new(
-        secret_key: Vec<u8>,
+        key: Vec<u8>,
         totp: bool,
         hash_function: HashFunction,
         counter: Option<u64>,
@@ -37,7 +37,7 @@ impl OTP {
             None => 6,
         };
         OTP {
-            secret_key,
+            key,
             counter,
             totp,
             output_len,
@@ -59,13 +59,11 @@ impl OTP {
             (counter & 0xff) as u8,
         ];
         let signing_key = match self.hash_function {
-            HashFunction::SHA1 => hmac::SigningKey::new(&digest::SHA1, &self.secret_key),
-            HashFunction::SHA256 => hmac::SigningKey::new(&digest::SHA256, &self.secret_key),
-            HashFunction::SHA384 => hmac::SigningKey::new(&digest::SHA384, &self.secret_key),
-            HashFunction::SHA512 => hmac::SigningKey::new(&digest::SHA512, &self.secret_key),
-            HashFunction::SHA512_256 => {
-                hmac::SigningKey::new(&digest::SHA512_256, &self.secret_key)
-            }
+            HashFunction::SHA1 => hmac::SigningKey::new(&digest::SHA1, &self.key),
+            HashFunction::SHA256 => hmac::SigningKey::new(&digest::SHA256, &self.key),
+            HashFunction::SHA384 => hmac::SigningKey::new(&digest::SHA384, &self.key),
+            HashFunction::SHA512 => hmac::SigningKey::new(&digest::SHA512, &self.key),
+            HashFunction::SHA512_256 => hmac::SigningKey::new(&digest::SHA512_256, &self.key),
         };
         let digest = hmac::sign(&signing_key, &message);
         self.encode_digest(digest.as_ref())
