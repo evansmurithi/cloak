@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate clap;
 extern crate data_encoding;
+extern crate dirs;
 extern crate open;
 extern crate ring;
 extern crate serde;

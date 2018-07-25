@@ -18,6 +18,7 @@ toml = "0.4.6"
 serde = "1.0"
 serde_derive = "1.0"
 open = "1.2.1"
+dirs = "1.0.2"
 
 [[bin]]
 bench = false
