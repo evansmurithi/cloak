@@ -95,7 +95,10 @@ fn run(matches: &ArgMatches) {
 }
 
 fn view_recovery_codes(account_name: &str) {
-    storage::open_recovery_codes(account_name);
+    match storage::open_recovery_codes(account_name) {
+        Ok(_) => {}
+        Err(err) => println!("Error {}", err),
+    };
 }
 
 fn add_account(_account_name: &str, _secret_key: &str, _counter: u64) {}

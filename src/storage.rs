@@ -1,9 +1,13 @@
 use open;
 use std::error::Error;
 use std::fs;
+use std::io;
+use std::path::Path;
 use toml;
 
-const FILE_PATH: &str = "/home/evans/.2fa";
+const APP_DIR: &str = "/home/evans/.2fa/";
+const RECOVERY_CODES_DIR: &str = "recovery_codes/";
+const ACCOUNTS_FILE: &str = "accounts";
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Accounts {
@@ -20,7 +24,8 @@ pub struct Account {
 }
 
 pub fn get(name: &str) -> Result<Option<Account>, Box<Error>> {
-    let accounts_toml = fs::read_to_string(FILE_PATH).expect("Unable to read file");
+    let file_path = format!("{}{}", APP_DIR, ACCOUNTS_FILE);
+    let accounts_toml = fs::read_to_string(file_path).expect("Unable to read file");
     let accounts: Accounts = toml::from_str(&accounts_toml).unwrap();
     let mut found_account: Option<Account> = None;
     for account in accounts.accounts.unwrap() {
@@ -32,14 +37,25 @@ pub fn get(name: &str) -> Result<Option<Account>, Box<Error>> {
 }
 
 pub fn list() -> Result<Vec<Account>, Box<Error>> {
-    let accounts_toml = fs::read_to_string(FILE_PATH).expect("Unable to read file");
+    let file_path = format!("{}{}", APP_DIR, ACCOUNTS_FILE);
+    let accounts_toml = fs::read_to_string(file_path).expect("Unable to read file");
     let accounts: Accounts = toml::from_str(&accounts_toml).unwrap();
     Ok(accounts.accounts.unwrap_or(vec![]))
 }
 
-pub fn open_recovery_codes(account_name: &str) {
-    match open::that("/home/evans/.2fa") {
+pub fn open_recovery_codes(account_name: &str) -> io::Result<()> {
+    let recovery_codes_dir = format!("{}{}", APP_DIR, RECOVERY_CODES_DIR);
+    let file_path = format!("{}{}{}", APP_DIR, RECOVERY_CODES_DIR, account_name);
+    fs::create_dir_all(&recovery_codes_dir)?;
+    if !Path::new(&file_path).is_file() {
+        let _ = fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&file_path);
+    }
+    match open::that(file_path) {
         Ok(_) => {}
         Err(err) => println!("Error {}", err),
     };
+    Ok(())
 }
