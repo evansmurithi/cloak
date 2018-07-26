@@ -121,7 +121,7 @@ fn main() {
 }
 
 fn view_recovery_codes(account_name: &str) {
-    match storage::open_recovery_codes(account_name) {
+    match storage::recovery_codes(account_name) {
         Ok(_) => {}
         Err(err) => println!("Error {}", err),
     };

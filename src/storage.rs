@@ -37,7 +37,7 @@ pub fn write(accounts: &HashMap<String, Account>) -> io::Result<()> {
     Ok(())
 }
 
-pub fn open_recovery_codes(account_name: &str) -> io::Result<()> {
+pub fn recovery_codes(account_name: &str) -> io::Result<()> {
     let recovery_codes_dir = Path::new(&dirs::home_dir().unwrap())
         .join(APP_DIR)
         .join(RECOVERY_CODES_DIR);
