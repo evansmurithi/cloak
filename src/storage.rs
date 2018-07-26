@@ -1,5 +1,6 @@
 use dirs;
 use open;
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 use std::io;
@@ -11,41 +12,20 @@ const RECOVERY_CODES_DIR: &str = "recovery_codes/";
 const ACCOUNTS_FILE: &str = "accounts";
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Accounts {
-    accounts: Option<Vec<Account>>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
 pub struct Account {
-    pub name: String,
     pub key: String,
     pub totp: bool,
     pub hash_function: String,
     pub counter: Option<u64>,
 }
 
-pub fn get(name: &str) -> Result<Option<Account>, Box<Error>> {
+pub fn read() -> Result<HashMap<String, Account>, Box<Error>> {
     let file_path = Path::new(&dirs::home_dir().unwrap())
         .join(APP_DIR)
         .join(ACCOUNTS_FILE);
     let accounts_toml = fs::read_to_string(file_path).expect("Unable to read file");
-    let accounts: Accounts = toml::from_str(&accounts_toml).unwrap();
-    let mut found_account: Option<Account> = None;
-    for account in accounts.accounts.unwrap() {
-        if account.name == name {
-            found_account = Some(account);
-        }
-    }
-    Ok(found_account)
-}
-
-pub fn list() -> Result<Vec<Account>, Box<Error>> {
-    let file_path = Path::new(&dirs::home_dir().unwrap())
-        .join(APP_DIR)
-        .join(ACCOUNTS_FILE);
-    let accounts_toml = fs::read_to_string(file_path).expect("Unable to read file");
-    let accounts: Accounts = toml::from_str(&accounts_toml).unwrap();
-    Ok(accounts.accounts.unwrap_or(vec![]))
+    let accounts: HashMap<String, Account> = toml::from_str(&accounts_toml).unwrap();
+    Ok(accounts)
 }
 
 pub fn open_recovery_codes(account_name: &str) -> io::Result<()> {

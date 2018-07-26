@@ -9,7 +9,7 @@ extern crate serde;
 extern crate serde_derive;
 extern crate toml;
 
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{App, Arg, SubCommand};
 use data_encoding::BASE32_NOPAD;
 
 mod otp;
@@ -71,10 +71,6 @@ fn main() {
         )
         .get_matches();
 
-    run(&matches)
-}
-
-fn run(matches: &ArgMatches) {
     match matches.subcommand() {
         ("add", Some(sub_m)) => add_account(
             sub_m.value_of("account").unwrap(),
@@ -105,23 +101,23 @@ fn view_recovery_codes(account_name: &str) {
 fn add_account(_account_name: &str, _key: &str, _counter: u64) {}
 
 fn view_account(account_name: &str, length: usize) {
-    match storage::get(account_name) {
-        Ok(Some(account)) => {
-            print_otp_code(&account, Some(length));
-        }
-        Ok(None) => println!(
-            "Account with the name {} does not exist. Consider adding it.",
-            account_name
-        ),
+    match storage::read() {
+        Ok(accounts) => match accounts.get(account_name) {
+            Some(account) => print_otp_code(account_name, account, Some(length)),
+            None => println!(
+                "Account with the name {} does not exist. Consider adding it.",
+                account_name
+            ),
+        },
         Err(err) => println!("Error {}", err),
     };
 }
 
 fn list_accounts() {
-    match storage::list() {
+    match storage::read() {
         Ok(accounts) => {
-            for account in accounts {
-                print_otp_code(&account, None);
+            for (name, account) in accounts {
+                print_otp_code(&name, &account, None);
                 println!("\n");
             }
         }
@@ -129,7 +125,7 @@ fn list_accounts() {
     };
 }
 
-fn print_otp_code(account: &storage::Account, code_length: Option<usize>) {
+fn print_otp_code(name: &str, account: &storage::Account, code_length: Option<usize>) {
     let decoded_key = BASE32_NOPAD.decode(account.key.as_bytes()).unwrap();
     let hash_function = match account.hash_function.as_ref() {
         "SHA1" => otp::HashFunction::SHA1,
@@ -148,8 +144,8 @@ fn print_otp_code(account: &storage::Account, code_length: Option<usize>) {
     );
 
     if account.totp {
-        println!("Account: {}\nTOTP: {}", account.name, otp.generate());
+        println!("Account: {}\nTOTP: {}", name, otp.generate());
     } else {
-        println!("Account: {}\nHOTP: {}", account.name, otp.generate());
+        println!("Account: {}\nHOTP: {}", name, otp.generate());
     }
 }
