@@ -73,11 +73,13 @@ fn main() {
         )
         .subcommand(SubCommand::with_name("list").about("List OTP for all accounts"))
         .subcommand(
-            SubCommand::with_name("edit").about("Edit an account").arg(
-                Arg::with_name("account")
-                    .required(true)
-                    .help("Name of the account"),
-            ),
+            SubCommand::with_name("delete")
+                .about("Delete an account")
+                .arg(
+                    Arg::with_name("account")
+                        .required(true)
+                        .help("Name of the account"),
+                ),
         )
         .subcommand(
             SubCommand::with_name("recovery_codes")
@@ -112,7 +114,7 @@ fn main() {
             view_account(sub_m.value_of("account").unwrap(), length)
         }
         ("list", Some(_)) => list_accounts(),
-        ("edit", Some(_sub_m)) => {}
+        ("delete", Some(sub_m)) => delete_account(sub_m.value_of("account").unwrap()),
         ("recovery_codes", Some(sub_m)) => view_recovery_codes(sub_m.value_of("account").unwrap()),
         _ => println!("No subcommand chosen"),
     }
@@ -144,6 +146,23 @@ fn add_account(account_name: &str, key: &str, totp: bool, hash_function: &str) {
                     Ok(_) => println!("Account successfully created"),
                     Err(err) => println!("Error {}", err),
                 };
+            }
+        }
+        Err(err) => println!("Error {}", err),
+    }
+}
+
+fn delete_account(account_name: &str) {
+    match storage::read() {
+        Ok(mut accounts) => {
+            if accounts.get(account_name).is_some() {
+                accounts.remove(account_name);
+                match storage::write(&accounts) {
+                    Ok(_) => println!("Account successfully deleted"),
+                    Err(err) => println!("Error {}", err),
+                };
+            } else {
+                println!("Account does not exist");
             }
         }
         Err(err) => println!("Error {}", err),
