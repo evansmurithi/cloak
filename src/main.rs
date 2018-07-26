@@ -33,7 +33,26 @@ fn main() {
                         .required(true)
                         .help("Secret key of the OTP"),
                 )
-                .arg(Arg::with_name("counter").required(true).help("Counter")),
+                .arg(
+                    Arg::with_name("totp")
+                        .long("totp")
+                        .conflicts_with("hotp")
+                        .help("Time based account (default)"),
+                )
+                .arg(
+                    Arg::with_name("hotp")
+                        .long("hotp")
+                        .help("Counter based account"),
+                )
+                .arg(
+                    Arg::with_name("algorithm")
+                        .short("a")
+                        .long("algorithm")
+                        .takes_value(true)
+                        .possible_values(&["SHA1", "SHA256", "SHA384", "SHA512", "SHA512_256"])
+                        .value_name("ALGORITHM")
+                        .help("Algorithm to use to generate the OTP code"),
+                ),
         )
         .subcommand(
             SubCommand::with_name("view")
@@ -72,11 +91,19 @@ fn main() {
         .get_matches();
 
     match matches.subcommand() {
-        ("add", Some(sub_m)) => add_account(
-            sub_m.value_of("account").unwrap(),
-            sub_m.value_of("key").unwrap(),
-            sub_m.value_of("counter").unwrap().parse::<u64>().unwrap(),
-        ),
+        ("add", Some(sub_m)) => {
+            let totp = !sub_m.is_present("hotp");
+            let hash_function = match sub_m.value_of("algorithm") {
+                Some(algorithm) => algorithm,
+                None => "SHA1",
+            };
+            add_account(
+                sub_m.value_of("account").unwrap(),
+                sub_m.value_of("key").unwrap(),
+                totp,
+                hash_function,
+            )
+        }
         ("view", Some(sub_m)) => {
             let length = match sub_m.value_of("length") {
                 Some(length) => length.parse::<usize>().unwrap(),
@@ -98,7 +125,30 @@ fn view_recovery_codes(account_name: &str) {
     };
 }
 
-fn add_account(_account_name: &str, _key: &str, _counter: u64) {}
+fn add_account(account_name: &str, key: &str, totp: bool, hash_function: &str) {
+    match storage::read() {
+        Ok(mut accounts) => {
+            let mut counter = if !totp { Some(0) } else { None };
+            let account = storage::Account {
+                key: key.to_string(),
+                totp,
+                hash_function: hash_function.to_string(),
+                counter,
+            };
+
+            if accounts.get(account_name).is_some() {
+                println!("Account already exists");
+            } else {
+                accounts.insert(account_name.to_string(), account);
+                match storage::write(&accounts) {
+                    Ok(_) => println!("Account successfully created"),
+                    Err(err) => println!("Error {}", err),
+                };
+            }
+        }
+        Err(err) => println!("Error {}", err),
+    }
+}
 
 fn view_account(account_name: &str, length: usize) {
     match storage::read() {

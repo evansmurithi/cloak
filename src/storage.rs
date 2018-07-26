@@ -23,9 +23,18 @@ pub fn read() -> Result<HashMap<String, Account>, Box<Error>> {
     let file_path = Path::new(&dirs::home_dir().unwrap())
         .join(APP_DIR)
         .join(ACCOUNTS_FILE);
-    let accounts_toml = fs::read_to_string(file_path).expect("Unable to read file");
-    let accounts: HashMap<String, Account> = toml::from_str(&accounts_toml).unwrap();
+    let accounts_str = fs::read_to_string(file_path).expect("Unable to read file");
+    let accounts: HashMap<String, Account> = toml::from_str(&accounts_str).unwrap();
     Ok(accounts)
+}
+
+pub fn write(accounts: &HashMap<String, Account>) -> io::Result<()> {
+    let file_path = Path::new(&dirs::home_dir().unwrap())
+        .join(APP_DIR)
+        .join(ACCOUNTS_FILE);
+    let accounts_str = toml::to_string(accounts).unwrap();
+    fs::write(file_path, accounts_str).expect("Unable to write file");
+    Ok(())
 }
 
 pub fn open_recovery_codes(account_name: &str) -> io::Result<()> {
