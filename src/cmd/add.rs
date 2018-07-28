@@ -1,4 +1,5 @@
 use clap::{App, Arg, ArgMatches, SubCommand};
+use data_encoding::BASE32_NOPAD;
 use fs;
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -12,7 +13,8 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
         .arg(
             Arg::with_name("key")
                 .required(true)
-                .help("Secret key of the OTP"),
+                .help("Secret key of the OTP")
+                .validator(is_base32_key),
         )
         .arg(
             Arg::with_name("totp")
@@ -34,6 +36,13 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .value_name("ALGORITHM")
                 .help("Algorithm to use to generate the OTP code"),
         )
+}
+
+fn is_base32_key(value: String) -> Result<(), String> {
+    match BASE32_NOPAD.decode(value.as_bytes()) {
+        Ok(_) => Ok(()),
+        Err(_) => Err(String::from("the key is not a valid base32 encoding")),
+    }
 }
 
 pub fn run(args: &ArgMatches) {
