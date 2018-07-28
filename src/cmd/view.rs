@@ -1,7 +1,6 @@
 use clap::{App, Arg, ArgMatches, SubCommand};
-use data_encoding::BASE32_NOPAD;
 use fs;
-use otp::OTP;
+use otp::OTPBuilder;
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("view")
@@ -30,14 +29,17 @@ pub fn run(args: &ArgMatches) {
     match fs::read() {
         Ok(accounts) => match accounts.get(account_name) {
             Some(account) => {
-                let decoded_key = BASE32_NOPAD.decode(account.key.as_bytes()).unwrap();
-                let otp = OTP::new(
-                    decoded_key,
-                    account.totp,
-                    &account.hash_function,
-                    account.counter,
-                    Some(length),
-                );
+                let counter = match account.counter {
+                    Some(count) => count,
+                    None => 0,
+                };
+                let otp = OTPBuilder::new()
+                    .key(&account.key)
+                    .hash_function(&account.hash_function)
+                    .totp(account.totp)
+                    .counter(counter)
+                    .output_len(length)
+                    .finalize();
                 println!("{}", otp.generate());
             }
             None => println!(

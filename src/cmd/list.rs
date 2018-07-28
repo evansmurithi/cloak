@@ -1,7 +1,6 @@
 use clap::{App, SubCommand};
-use data_encoding::BASE32_NOPAD;
 use fs;
-use otp::OTP;
+use otp::OTPBuilder;
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("list").about("List OTP for all accounts")
@@ -11,14 +10,16 @@ pub fn run() {
     match fs::read() {
         Ok(accounts) => {
             for (name, account) in accounts {
-                let decoded_key = BASE32_NOPAD.decode(account.key.as_bytes()).unwrap();
-                let otp = OTP::new(
-                    decoded_key,
-                    account.totp,
-                    &account.hash_function,
-                    account.counter,
-                    None,
-                );
+                let counter = match account.counter {
+                    Some(count) => count,
+                    None => 0,
+                };
+                let otp = OTPBuilder::new()
+                    .key(&account.key)
+                    .hash_function(&account.hash_function)
+                    .totp(account.totp)
+                    .counter(counter)
+                    .finalize();
                 if account.totp {
                     println!("Account: {}\nTOTP: {}", name, otp.generate());
                 } else {

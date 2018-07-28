@@ -1,7 +1,8 @@
+use data_encoding::BASE32_NOPAD;
 use ring::{digest, hmac};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum HashFunction {
     SHA1,
     SHA256,
@@ -21,39 +22,6 @@ pub struct OTP {
 }
 
 impl OTP {
-    pub fn new(
-        key: Vec<u8>,
-        totp: bool,
-        hash_function: &str,
-        counter: Option<u64>,
-        output_len: Option<usize>,
-    ) -> OTP {
-        let counter = match counter {
-            Some(c) => c,
-            None => 0 as u64,
-        };
-        let output_len = match output_len {
-            Some(len) => len,
-            None => 6,
-        };
-        let hash_function = match hash_function {
-            "SHA1" => HashFunction::SHA1,
-            "SHA256" => HashFunction::SHA256,
-            "SHA384" => HashFunction::SHA384,
-            "SHA512" => HashFunction::SHA512,
-            "SHA512_256" => HashFunction::SHA512_256,
-            _ => HashFunction::SHA1,
-        };
-        OTP {
-            key,
-            counter,
-            totp,
-            output_len,
-            output_base: "0123456789".to_owned().into_bytes(),
-            hash_function,
-        }
-    }
-
     pub fn generate(&self) -> String {
         let counter = self.get_counter();
         let message: [u8; 8] = [
@@ -105,19 +73,90 @@ impl OTP {
     }
 }
 
+#[derive(Debug)]
+pub struct OTPBuilder {
+    key: Option<Vec<u8>>,
+    counter: u64,
+    totp: bool,
+    output_len: usize,
+    output_base: Vec<u8>,
+    hash_function: HashFunction,
+}
+
+impl OTPBuilder {
+    pub fn new() -> OTPBuilder {
+        OTPBuilder {
+            key: None,
+            counter: 0,
+            totp: true,
+            output_len: 6,
+            output_base: "0123456789".to_owned().into_bytes(),
+            hash_function: HashFunction::SHA1,
+        }
+    }
+
+    pub fn key(&mut self, key: &str) -> &mut OTPBuilder {
+        let key = BASE32_NOPAD.decode(key.as_bytes()).unwrap();
+        self.key = Some(key);
+        self
+    }
+
+    pub fn hash_function(&mut self, hash_function: &str) -> &mut OTPBuilder {
+        self.hash_function = match hash_function {
+            "SHA1" => HashFunction::SHA1,
+            "SHA256" => HashFunction::SHA256,
+            "SHA384" => HashFunction::SHA384,
+            "SHA512" => HashFunction::SHA512,
+            "SHA512_256" => HashFunction::SHA512_256,
+            _ => HashFunction::SHA1,
+        };
+        self
+    }
+
+    pub fn totp(&mut self, is_totp: bool) -> &mut OTPBuilder {
+        self.totp = is_totp;
+        self
+    }
+
+    pub fn counter(&mut self, counter: u64) -> &mut OTPBuilder {
+        self.counter = counter;
+        self
+    }
+
+    pub fn output_len(&mut self, length: usize) -> &mut OTPBuilder {
+        self.output_len = length;
+        self
+    }
+
+    pub fn finalize(&self) -> OTP {
+        if self.key.is_none() {
+            panic!("Key must be provided");
+        }
+        OTP {
+            key: self.key.clone().unwrap(),
+            counter: self.counter,
+            totp: self.totp,
+            output_len: self.output_len,
+            output_base: self.output_base.clone(),
+            hash_function: self.hash_function,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::OTP;
+    use super::OTPBuilder;
 
     macro_rules! test_hotp_hash_fn {
         ($func:ident, $hf:expr, $c:tt) => {
             #[test]
             fn $func() {
-                let decoded_key = vec![
-                    224, 50, 146, 192, 168, 54, 25, 165, 50, 110, 119, 244, 143, 20, 14, 207, 178,
-                    91, 38, 62,
-                ];
-                let hotp = OTP::new(decoded_key, false, $hf, None, None);
+                let key = "4AZJFQFIGYM2KMTOO72I6FAOZ6ZFWJR6";
+                let hotp = OTPBuilder::new()
+                    .key(key)
+                    .hash_function($hf)
+                    .totp(false)
+                    .finalize();
                 assert_eq!(hotp.generate(), $c);
             }
         };
@@ -131,11 +170,12 @@ mod tests {
 
     #[test]
     fn test_hotp_default() {
-        let decoded_key = vec![
-            224, 50, 146, 192, 168, 54, 25, 165, 50, 110, 119, 244, 143, 20, 14, 207, 178, 91, 38,
-            62,
-        ];
-        let hotp = OTP::new(decoded_key, false, "SHA1", None, None);
+        let key = "4AZJFQFIGYM2KMTOO72I6FAOZ6ZFWJR6";
+        let hotp = OTPBuilder::new()
+            .key(key)
+            .hash_function("SHA1")
+            .totp(false)
+            .finalize();
         assert_eq!(hotp.counter, 0);
         let code = hotp.generate();
         assert_eq!(code.len(), 6);
@@ -144,11 +184,14 @@ mod tests {
 
     #[test]
     fn test_hotp_given_counter_and_length() {
-        let decoded_key = vec![
-            224, 50, 146, 192, 168, 54, 25, 165, 50, 110, 119, 244, 143, 20, 14, 207, 178, 91, 38,
-            62,
-        ];
-        let hotp = OTP::new(decoded_key, false, "SHA1", Some(1), Some(8));
+        let key = "4AZJFQFIGYM2KMTOO72I6FAOZ6ZFWJR6";
+        let hotp = OTPBuilder::new()
+            .key(key)
+            .hash_function("SHA1")
+            .totp(false)
+            .counter(1)
+            .output_len(8)
+            .finalize();
         let code = hotp.generate();
         assert_eq!(code.len(), 8);
         assert_eq!(code, "34863669");
