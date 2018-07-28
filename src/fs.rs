@@ -1,10 +1,8 @@
 use dirs;
-use open;
-use std::collections::HashMap;
-use std::error::Error;
+use std::collections::BTreeMap;
 use std::fs;
 use std::io;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use toml;
 
 const APP_DIR: &str = ".2fa/";
@@ -19,16 +17,16 @@ pub struct Account {
     pub counter: Option<u64>,
 }
 
-pub fn read() -> Result<HashMap<String, Account>, Box<Error>> {
+pub fn read() -> io::Result<BTreeMap<String, Account>> {
     let file_path = Path::new(&dirs::home_dir().unwrap())
         .join(APP_DIR)
         .join(ACCOUNTS_FILE);
-    let accounts_str = fs::read_to_string(file_path).expect("Unable to read file");
-    let accounts: HashMap<String, Account> = toml::from_str(&accounts_str).unwrap();
+    let accounts_str = fs::read_to_string(file_path)?;
+    let accounts: BTreeMap<String, Account> = toml::from_str(&accounts_str).unwrap();
     Ok(accounts)
 }
 
-pub fn write(accounts: &HashMap<String, Account>) -> io::Result<()> {
+pub fn write(accounts: &BTreeMap<String, Account>) -> io::Result<()> {
     let file_path = Path::new(&dirs::home_dir().unwrap())
         .join(APP_DIR)
         .join(ACCOUNTS_FILE);
@@ -37,7 +35,7 @@ pub fn write(accounts: &HashMap<String, Account>) -> io::Result<()> {
     Ok(())
 }
 
-pub fn recovery_codes(account_name: &str) -> io::Result<()> {
+pub fn recovery_codes(account_name: &str) -> io::Result<(PathBuf)> {
     let recovery_codes_dir = Path::new(&dirs::home_dir().unwrap())
         .join(APP_DIR)
         .join(RECOVERY_CODES_DIR);
@@ -49,9 +47,5 @@ pub fn recovery_codes(account_name: &str) -> io::Result<()> {
             .create_new(true)
             .open(&file_path);
     }
-    match open::that(file_path) {
-        Ok(_) => {}
-        Err(err) => println!("Error {}", err),
-    };
-    Ok(())
+    Ok(file_path)
 }

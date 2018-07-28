@@ -24,7 +24,7 @@ impl OTP {
     pub fn new(
         key: Vec<u8>,
         totp: bool,
-        hash_function: HashFunction,
+        hash_function: &str,
         counter: Option<u64>,
         output_len: Option<usize>,
     ) -> OTP {
@@ -35,6 +35,14 @@ impl OTP {
         let output_len = match output_len {
             Some(len) => len,
             None => 6,
+        };
+        let hash_function = match hash_function {
+            "SHA1" => HashFunction::SHA1,
+            "SHA256" => HashFunction::SHA256,
+            "SHA384" => HashFunction::SHA384,
+            "SHA512" => HashFunction::SHA512,
+            "SHA512_256" => HashFunction::SHA512_256,
+            _ => HashFunction::SHA1,
         };
         OTP {
             key,
@@ -99,7 +107,7 @@ impl OTP {
 
 #[cfg(test)]
 mod tests {
-    use super::{HashFunction, OTP};
+    use super::OTP;
 
     macro_rules! test_hotp_hash_fn {
         ($func:ident, $hf:expr, $c:tt) => {
@@ -115,11 +123,11 @@ mod tests {
         };
     }
 
-    test_hotp_hash_fn!(test_sha1, HashFunction::SHA1, "852241");
-    test_hotp_hash_fn!(test_sha256, HashFunction::SHA256, "851154");
-    test_hotp_hash_fn!(test_sha384, HashFunction::SHA384, "607946");
-    test_hotp_hash_fn!(test_sha512, HashFunction::SHA512, "377017");
-    test_hotp_hash_fn!(test_sha512_256, HashFunction::SHA512_256, "171117");
+    test_hotp_hash_fn!(test_sha1, "SHA1", "852241");
+    test_hotp_hash_fn!(test_sha256, "SHA256", "851154");
+    test_hotp_hash_fn!(test_sha384, "SHA384", "607946");
+    test_hotp_hash_fn!(test_sha512, "SHA512", "377017");
+    test_hotp_hash_fn!(test_sha512_256, "SHA512_256", "171117");
 
     #[test]
     fn test_hotp_default() {
@@ -127,7 +135,7 @@ mod tests {
             224, 50, 146, 192, 168, 54, 25, 165, 50, 110, 119, 244, 143, 20, 14, 207, 178, 91, 38,
             62,
         ];
-        let hotp = OTP::new(decoded_key, false, HashFunction::SHA1, None, None);
+        let hotp = OTP::new(decoded_key, false, "SHA1", None, None);
         assert_eq!(hotp.counter, 0);
         let code = hotp.generate();
         assert_eq!(code.len(), 6);
@@ -140,7 +148,7 @@ mod tests {
             224, 50, 146, 192, 168, 54, 25, 165, 50, 110, 119, 244, 143, 20, 14, 207, 178, 91, 38,
             62,
         ];
-        let hotp = OTP::new(decoded_key, false, HashFunction::SHA1, Some(1), Some(8));
+        let hotp = OTP::new(decoded_key, false, "SHA1", Some(1), Some(8));
         let code = hotp.generate();
         assert_eq!(code.len(), 8);
         assert_eq!(code, "34863669");
