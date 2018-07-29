@@ -5,7 +5,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 use toml;
 
-const APP_DIR: &str = ".2fa/";
+const APP_DIR: &str = ".cloak/";
 const RECOVERY_CODES_DIR: &str = "recovery_codes/";
 const ACCOUNTS_FILE: &str = "accounts";
 
@@ -18,29 +18,35 @@ pub struct Account {
 }
 
 pub fn read() -> io::Result<BTreeMap<String, Account>> {
-    let file_path = Path::new(&dirs::home_dir().unwrap())
-        .join(APP_DIR)
-        .join(ACCOUNTS_FILE);
+    let app_dir = Path::new(&dirs::home_dir().unwrap())
+        .join(APP_DIR);
+    let file_path = create_file(&app_dir, ACCOUNTS_FILE)?;
     let accounts_str = fs::read_to_string(file_path)?;
     let accounts: BTreeMap<String, Account> = toml::from_str(&accounts_str).unwrap();
     Ok(accounts)
 }
 
 pub fn write(accounts: &BTreeMap<String, Account>) -> io::Result<()> {
-    let file_path = Path::new(&dirs::home_dir().unwrap())
-        .join(APP_DIR)
-        .join(ACCOUNTS_FILE);
+    let app_dir = Path::new(&dirs::home_dir().unwrap())
+        .join(APP_DIR);
+    let file_path = create_file(&app_dir, ACCOUNTS_FILE)?;
     let accounts_str = toml::to_string(accounts).unwrap();
     fs::write(file_path, accounts_str).expect("Unable to write file");
     Ok(())
 }
 
+// Return the file path containing the recovery codes for the account
 pub fn recovery_codes(account_name: &str) -> io::Result<(PathBuf)> {
     let recovery_codes_dir = Path::new(&dirs::home_dir().unwrap())
         .join(APP_DIR)
         .join(RECOVERY_CODES_DIR);
-    let file_path = recovery_codes_dir.join(account_name);
-    fs::create_dir_all(&recovery_codes_dir)?;
+    create_file(&recovery_codes_dir, account_name)
+}
+
+// Create the directory and file if they do not exist
+fn create_file(dir: &PathBuf, file_name: &str) -> io::Result<(PathBuf)> {
+    fs::create_dir_all(&dir)?;
+    let file_path = dir.join(file_name);
     if !file_path.is_file() {
         let _ = fs::OpenOptions::new()
             .write(true)

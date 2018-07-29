@@ -33,6 +33,9 @@ fn main() {
         ("list", Some(_)) => cmd::list::run(),
         ("delete", Some(sub_m)) => cmd::delete::run(&sub_m),
         ("recovery_codes", Some(sub_m)) => cmd::recovery_codes::run(&sub_m),
-        _ => println!("No subcommand chosen"),
+        _ => {
+            eprintln!("No subcommand chosen");
+            std::process::exit(1);
+        },
     }
 }

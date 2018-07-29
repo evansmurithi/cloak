@@ -1,6 +1,6 @@
-# 2fa
+# cloak
 
-A terminal based 2FA application.
+A Command Line OTP Authenticator application.
 
 This application will be implemented in rust as a means of learning the Rust
 programming language.

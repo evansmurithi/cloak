@@ -1,14 +1,14 @@
 [package]
-name = "two-fa"
+name = "cloak"
 version = "0.1.0"
 authors = ["Evans Murithi <murithievans80@gmail.com>"]
 exclude = []
-repository = "https://github.com/evansmurithi/2fa"
+repository = "https://github.com/evansmurithi/cloak"
 documentation = ""
-homepage = "https://github.com/evansmurithi/2fa"
+homepage = "https://github.com/evansmurithi/cloak"
 readme = "README.md"
 license = "MIT"
-description = "A terminal based 2FA application."
+description = "A Command Line OTP Authenticator application."
 
 [dependencies]
 clap = "2.32.0"
@@ -21,6 +21,5 @@ open = "1.2.1"
 dirs = "1.0.2"
 
 [[bin]]
-bench = false
 path = "src/main.rs"
-name = "2fa"
+name = "cloak"
