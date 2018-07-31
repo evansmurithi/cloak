@@ -36,13 +36,18 @@ pub fn run(args: &ArgMatches) {
                     account.counter,
                     Some(length),
                 );
-                println!("{}", otp.generate());
+                match otp {
+                    Ok(otp) => {
+                        println!("{}", otp.generate());
+                    }
+                    Err(err) => eprintln!("{}", err),
+                }
             }
             None => println!(
                 "Account with the name {} does not exist. Consider adding it.",
                 account_name
             ),
         },
-        Err(err) => println!("Error {}", err),
+        Err(err) => eprintln!("{}", err),
     };
 }

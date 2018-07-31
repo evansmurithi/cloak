@@ -69,10 +69,10 @@ pub fn run(args: &ArgMatches) {
                 accounts.insert(account_name.to_string(), account);
                 match fs::write(&accounts) {
                     Ok(_) => println!("Account successfully created"),
-                    Err(err) => println!("Error {}", err),
+                    Err(err) => eprintln!("{}", err),
                 };
             }
         }
-        Err(err) => println!("Error {}", err),
+        Err(err) => eprintln!("{}", err),
     };
 }

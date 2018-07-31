@@ -18,9 +18,9 @@ pub fn run(args: &ArgMatches) {
         Ok(file_path) => {
             match open::that(file_path) {
                 Ok(_) => {}
-                Err(err) => println!("Error {}", err),
+                Err(err) => eprintln!("{}", err),
             };
         }
-        Err(err) => println!("Error {}", err),
+        Err(err) => eprintln!("{}", err),
     };
 }

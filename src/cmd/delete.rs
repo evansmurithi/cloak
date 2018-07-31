@@ -19,12 +19,12 @@ pub fn run(args: &ArgMatches) {
                 accounts.remove(account_name);
                 match fs::write(&accounts) {
                     Ok(_) => println!("Account successfully deleted"),
-                    Err(err) => println!("Error {}", err),
+                    Err(err) => eprintln!("{}", err),
                 };
             } else {
                 println!("Account does not exist");
             }
         }
-        Err(err) => println!("Error {}", err),
+        Err(err) => eprintln!("{}", err),
     }
 }

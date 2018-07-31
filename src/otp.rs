@@ -1,4 +1,5 @@
 use data_encoding::BASE32_NOPAD;
+use errors::{Error, Result};
 use ring::{digest, hmac};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -28,8 +29,13 @@ impl OTP {
         hash_function: &str,
         counter: Option<u64>,
         output_len: Option<usize>,
-    ) -> OTP {
-        let decoded_key = BASE32_NOPAD.decode(key.as_bytes()).unwrap();
+    ) -> Result<OTP> {
+        let decoded_key = BASE32_NOPAD
+            .decode(key.as_bytes())
+            .map_err(|err| Error::KeyDecode {
+                key: key.to_owned(),
+                cause: Box::new(err),
+            })?;
         let counter = match counter {
             Some(c) => c,
             None => 0 as u64,
@@ -46,14 +52,15 @@ impl OTP {
             "SHA512_256" => HashFunction::SHA512_256,
             _ => HashFunction::SHA1,
         };
-        OTP {
+        let otp = OTP {
             key: decoded_key,
             counter,
             totp,
             output_len,
             output_base: "0123456789".to_owned().into_bytes(),
             hash_function,
-        }
+        };
+        Ok(otp)
     }
 
     pub fn generate(&self) -> String {
@@ -116,7 +123,7 @@ mod tests {
             #[test]
             fn $func() {
                 let key = "4AZJFQFIGYM2KMTOO72I6FAOZ6ZFWJR6";
-                let hotp = OTP::new(key, false, $hf, None, None);
+                let hotp = OTP::new(key, false, $hf, None, None).unwrap();
                 assert_eq!(hotp.generate(), $c);
             }
         };
@@ -131,7 +138,7 @@ mod tests {
     #[test]
     fn test_hotp_default() {
         let key = "4AZJFQFIGYM2KMTOO72I6FAOZ6ZFWJR6";
-        let hotp = OTP::new(key, false, "SHA1", None, None);
+        let hotp = OTP::new(key, false, "SHA1", None, None).unwrap();
         assert_eq!(hotp.counter, 0);
         let code = hotp.generate();
         assert_eq!(code.len(), 6);
@@ -141,7 +148,7 @@ mod tests {
     #[test]
     fn test_hotp_given_counter_and_length() {
         let key = "4AZJFQFIGYM2KMTOO72I6FAOZ6ZFWJR6";
-        let hotp = OTP::new(key, false, "SHA1", Some(1), Some(8));
+        let hotp = OTP::new(key, false, "SHA1", Some(1), Some(8)).unwrap();
         let code = hotp.generate();
         assert_eq!(code.len(), 8);
         assert_eq!(code, "34863669");

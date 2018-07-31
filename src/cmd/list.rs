@@ -17,14 +17,19 @@ pub fn run() {
                     account.counter,
                     None,
                 );
-                if account.totp {
-                    println!("Account: {}\nTOTP: {}", name, otp.generate());
-                } else {
-                    println!("Account: {}\nHOTP: {}", name, otp.generate());
+                match otp {
+                    Ok(otp) => {
+                        if account.totp {
+                            println!("Account: {}\nTOTP: {}", name, otp.generate());
+                        } else {
+                            println!("Account: {}\nHOTP: {}", name, otp.generate());
+                        }
+                        println!("\n");
+                    }
+                    Err(err) => eprintln!("{}", err),
                 }
-                println!("\n");
             }
         }
-        Err(err) => println!("Error {}", err),
+        Err(err) => eprintln!("{}", err),
     };
 }

@@ -3,6 +3,8 @@ extern crate clap;
 extern crate data_encoding;
 extern crate dirs;
 extern crate open;
+#[macro_use]
+extern crate failure;
 extern crate ring;
 extern crate serde;
 #[macro_use]
@@ -12,6 +14,7 @@ extern crate toml;
 use clap::App;
 
 mod cmd;
+mod errors;
 mod fs;
 mod otp;
 
@@ -35,7 +38,6 @@ fn main() {
         ("recovery_codes", Some(sub_m)) => cmd::recovery_codes::run(&sub_m),
         _ => {
             eprintln!("No subcommand chosen");
-            std::process::exit(1);
-        },
+        }
     }
 }
