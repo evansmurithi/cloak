@@ -1,6 +1,7 @@
 use clap::{App, Arg, ArgMatches, SubCommand};
 use fs;
 
+// Create arguments for `delete` subcommand
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("delete")
         .about("Delete an account")
@@ -11,6 +12,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
         )
 }
 
+// Implementation for the `delete` subcommand
 pub fn run(args: &ArgMatches) {
     let account_name = args.value_of("account").unwrap();
     match fs::read() {

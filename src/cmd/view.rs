@@ -2,6 +2,7 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 use fs;
 use otp::OTP;
 
+// Create arguments for `view` subcommand
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("view")
         .about("View the OTP for an account")
@@ -16,10 +17,20 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .long("length")
                 .takes_value(true)
                 .value_name("NUMBER")
-                .help("Length of the OTP"),
+                .help("Length of the OTP")
+                .validator(is_number),
         )
 }
 
+// Validate length provided in arguments is a number
+fn is_number(value: String) -> Result<(), String> {
+    match value.parse::<usize>() {
+        Ok(_) => Ok(()),
+        Err(_) => Err(String::from("length must be a number")),
+    }
+}
+
+// Implementation for the `view` subcommand
 pub fn run(args: &ArgMatches) {
     let length = match args.value_of("length") {
         Some(length) => length.parse::<usize>().unwrap(),
@@ -44,7 +55,7 @@ pub fn run(args: &ArgMatches) {
                 }
             }
             None => println!(
-                "Account with the name {} does not exist. Consider adding it.",
+                "Account with the name '{}' does not exist. Consider adding it.",
                 account_name
             ),
         },

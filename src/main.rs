@@ -19,6 +19,7 @@ mod fs;
 mod otp;
 
 fn main() {
+    // Define list of subcommand for the `cloak` app
     let matches = App::new(crate_name!())
         .author(crate_authors!("\n"))
         .about(crate_description!())
@@ -36,8 +37,6 @@ fn main() {
         ("list", Some(_)) => cmd::list::run(),
         ("delete", Some(sub_m)) => cmd::delete::run(&sub_m),
         ("recovery_codes", Some(sub_m)) => cmd::recovery_codes::run(&sub_m),
-        _ => {
-            eprintln!("No subcommand chosen");
-        }
+        _ => eprintln!("No subcommand chosen")
     }
 }

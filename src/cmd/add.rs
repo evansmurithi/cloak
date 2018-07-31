@@ -2,6 +2,7 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 use data_encoding::BASE32_NOPAD;
 use fs;
 
+// Create arguments for `add` subcommand
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("add")
         .about("Add a new account")
@@ -38,6 +39,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
         )
 }
 
+// Validate key provided in arguments is a valid base32 encoding
 fn is_base32_key(value: String) -> Result<(), String> {
     match BASE32_NOPAD.decode(value.as_bytes()) {
         Ok(_) => Ok(()),
@@ -45,6 +47,7 @@ fn is_base32_key(value: String) -> Result<(), String> {
     }
 }
 
+// Implementation for the `add` subcommand
 pub fn run(args: &ArgMatches) {
     let totp = !args.is_present("hotp");
     let hash_function = match args.value_of("algorithm") {

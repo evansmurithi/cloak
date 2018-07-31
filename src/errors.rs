@@ -3,10 +3,10 @@ use std::io;
 use std::result;
 use toml::{de, ser};
 
-// result returned by this crate
+// `Result` returned by this crate
 pub type Result<T> = result::Result<T, Error>;
 
-// cloak error
+// `cloak` error
 #[derive(Debug, Fail)]
 pub enum Error {
     #[fail(display = "Decoding failed for key '{}': {}", key, cause)]

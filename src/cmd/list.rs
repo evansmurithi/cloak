@@ -2,10 +2,12 @@ use clap::{App, SubCommand};
 use fs;
 use otp::OTP;
 
+// `list` subcommand
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("list").about("List OTP for all accounts")
 }
 
+// Implementation for the `list` subcommand
 pub fn run() {
     match fs::read() {
         Ok(accounts) => {

@@ -2,6 +2,7 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 use fs;
 use open;
 
+// Create arguments for `recovery_codes` subcommand
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("recovery_codes")
         .about("View recovery codes for an account")
@@ -12,6 +13,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
         )
 }
 
+// Implementation for the `recovery_codes` subcommand
 pub fn run(args: &ArgMatches) {
     let account_name = args.value_of("account").unwrap();
     match fs::recovery_codes(account_name) {

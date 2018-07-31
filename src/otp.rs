@@ -3,6 +3,7 @@ use errors::{Error, Result};
 use ring::{digest, hmac};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+// Define the types of hash functions supported
 #[derive(Debug)]
 pub enum HashFunction {
     SHA1,
@@ -12,6 +13,7 @@ pub enum HashFunction {
     SHA512_256,
 }
 
+// Structure representing a One Time Password
 #[derive(Debug)]
 pub struct OTP {
     key: Vec<u8>,
@@ -63,6 +65,7 @@ impl OTP {
         Ok(otp)
     }
 
+    // Generate a code as defined in [RFC4226](https://tools.ietf.org/html/rfc4226)
     pub fn generate(&self) -> String {
         let counter = self.get_counter();
         let message: [u8; 8] = [
@@ -101,6 +104,7 @@ impl OTP {
         code
     }
 
+    // Calculate counter based on whether the OTP is time based or counter based
     fn get_counter(&self) -> u64 {
         if self.totp {
             let timestamp = SystemTime::now()
