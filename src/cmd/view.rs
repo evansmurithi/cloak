@@ -62,3 +62,17 @@ pub fn run(args: &ArgMatches) {
         Err(err) => eprintln!("{}", err),
     };
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_is_number() {
+        let result = super::is_number(String::from("meow"));
+        assert!(result.is_err());
+        assert_eq!(result.err(), Some(String::from("length must be a number")));
+
+        let result = super::is_number(String::from("8"));
+        assert!(result.is_ok());
+        assert_eq!(result.ok(), Some(()));
+    }
+}
