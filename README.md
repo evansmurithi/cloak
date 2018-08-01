@@ -1,11 +1,20 @@
 # cloak
 
-A Command Line OTP Authenticator application.
+A Command Line OTP Authenticator application written in Rust that generates
+time-based and counter-based OTP codes.
 
-This application will be implemented in rust as a means of learning the Rust
-programming language.
+## Motivation
 
-This application is aimed at supporting:
+- As a means of learning the Rust programming language.
+- I was tired of entering the OTP code from my phone to my laptop when
+authenticating myself.
 
-- One Time Passwords (TOTP and HOTP)
-- Securely storing recovery codes
+## Examples
+
+## Installation
+
+## Usage
+
+## Building
+
+## Running tests
