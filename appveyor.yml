@@ -1,0 +1,76 @@
+environment:
+  global:
+    PROJECT_NAME: cloak
+
+  matrix:
+    # Stable channel
+    - TARGET: i686-pc-windows-msvc
+      RUST_CHANNEL: stable
+    - TARGET: x86_64-pc-windows-msvc
+      RUST_CHANNEL: stable
+
+    # Beta channel
+    - TARGET: i686-pc-windows-msvc
+      RUST_CHANNEL: beta
+    - TARGET: x86_64-pc-windows-msvc
+      RUST_CHANNEL: beta
+
+    # Nightly channel
+    - TARGET: i686-pc-windows-msvc
+      RUST_CHANNEL: nightly
+    - TARGET: x86_64-pc-windows-msvc
+      RUST_CHANNEL: nightly
+
+# Install Rust and Cargo
+install:
+  - ps: >-
+      If ($Env:TARGET -eq 'x86_64-pc-windows-gnu') {
+        $Env:PATH += ';C:\msys64\mingw64\bin'
+      } ElseIf ($Env:TARGET -eq 'i686-pc-windows-gnu') {
+        $Env:PATH += ';C:\msys64\mingw32\bin'
+      }
+  - curl -sSf -o rustup-init.exe https://win.rustup.rs/
+  - rustup-init.exe -y --default-host %TARGET% --default-toolchain %RUST_CHANNEL%
+  - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
+  - rustc -Vv
+  - cargo -V
+
+# Building is done in the test phase, so we disable Appveyor's build phase.
+build: false
+
+# Equivalent to Travis' `script` phase
+test_script:
+  - cargo build --verbose
+  - cargo test --verbose
+
+before_deploy:
+  # Generate artifacts for release
+  - cargo build --release
+  - mkdir staging
+  - copy target\release\mdbook.exe staging
+  - cd staging
+  - 7z a ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%.zip *
+  - appveyor PushArtifact ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%.zip
+
+deploy:
+  artifact: /.*\.zip/
+  auth_token:
+    secure: chvt6Gw6dTdrWFr5c1qFmCdylM8Qbk9VDEO4Z5zu/cNg9EhCHYtG98BEIB9WgFxx
+  description: 'Windows release'
+  on:
+    RUST_CHANNEL: stable
+    appveyor_repo_tag: true
+  provider: GitHub
+
+cache:
+  - C:\Users\appveyor\.cargo\registry
+  - target
+
+branches:
+  only:
+    - "/^v\\d+\\.\\d+\\.\\d+.*$/"
+    - master
+
+notifications:
+  - provider: Email
+    on_build_success: false

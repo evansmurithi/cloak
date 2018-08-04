@@ -1,0 +1,46 @@
+language: rust
+
+cache:
+  timeout: 360
+  cargo: true
+
+before_cache:
+  # Travis can't cache files that are not readable by "others"
+  - chmod -R a+r $HOME/.cargo
+
+env:
+  global:
+    - CRATE_NAME=cloak
+    - TARGET=x86_64-unknown-linux-gnu
+
+install:
+  - sh ci/install.sh
+  - export PATH=$PATH:$HOME/.cargo/bin
+
+script:
+  - cargo build --all --no-default-features
+  - cargo build --verbose
+  - cargo test --verbose
+
+before_deploy:
+  - sh ci/before_deploy.sh
+
+deploy:
+  api_key:
+    secure: Bl+5uacvHcNVrzaY2drsEnL2OH1ETvRWUIW+nO5zHhFO/Wu85EIUjOHpkkFPzEwEsMScbOlRK197cEQhnKIHgyyiK7bMm3MeilIlc+JRUGGpbK3iPhE9M3UrMpPSNdKZbRZWvXPSUQ79DUe+nxav6fNIHTDLSNzSYbHVELpqO5biIeR3nUy5QLvC7nLyz3+xIdYNpGGYZyCXgnX1D6BObfoMXX9VDfog/qD960SZD09Ca7/HyAtDBCG2FjwYrMgsTxE2txQ7LN2GzcPVU4mjkAjNBTP1yE8M4OslNObSwmn2zC/BvxR/dUbN9AHjfNRXbZTVgU0ri7FYtqfjllMohMutoqKyJWrrioFt+a37jEfzuMQfsmClZmg7qy2zIzQIKb9AKN+7DKNiFGwxm6oP1nSgPijnAj9lDD0/9vym/jTCfnQsuUOuA++uEu6K3pvpGX8nzEu/wefDE+Pxduq1dZt2wKnFdFWR8aW5DYdcxNbC8VBTVPZyC0c6HOJNMH7m1OAE2Q2KEwlX6AylwrhRR21BXL08/4eqnVnNzKJu0bkh7/ipVs2MaLqMB0d45KJh940XGkqNtyni14s1gw9WbtZS8EwHGwCosBzu8Ag4lEN3ePGe07EGn+mAUVMSqUJpXgO2v8XYMpfXiIMvR5CJZxhfpSRdWhCnDGK8UvOLYnE=
+  file_glob: true
+  file: $CRATE_NAME-$TRAVIS_TAG-$TARGET.*
+  on:
+    condition: $TRAVIS_RUST_VERSION = stable
+    tags: true
+  provider: releases
+  skip_cleanup: true
+
+branches:
+  only:
+    - "/^v\\d+\\.\\d+\\.\\d+.*$/"
+    - master
+
+notifications:
+  email:
+    on_success: never
