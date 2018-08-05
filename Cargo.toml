@@ -7,6 +7,8 @@ repository = "https://github.com/evansmurithi/cloak"
 documentation = ""
 homepage = "https://github.com/evansmurithi/cloak"
 readme = "README.md"
+keywords = ["otp", "cli", "authentication"]
+categories = ["command-line-utilities", "authentication"]
 license = "MIT"
 description = "A Command Line OTP Authenticator application."
 
