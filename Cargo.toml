@@ -2,7 +2,7 @@
 name = "cloak"
 version = "0.1.0"
 authors = ["Evans Murithi <murithievans80@gmail.com>"]
-exclude = []
+exclude = ["assets/*"]
 repository = "https://github.com/evansmurithi/cloak"
 documentation = ""
 homepage = "https://github.com/evansmurithi/cloak"
