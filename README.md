@@ -16,7 +16,7 @@ my phone to my laptop.
 ## Example
 
 <p align="center">
-    <img src="/tmp/cloak_example.svg">
+    <img src="https://cdn.rawgit.com/evansmurithi/cloak/063722bc2e797841fcbceda85743bd338c6600c5/assets/cloak_example.svg">
 </p>
 
 ## Installation
