@@ -15,8 +15,7 @@ main() {
             ;;
     esac
 
-    # This will slow down the build, but is necessary to not run out of disk space
-    cargo clean
+    test -f Cargo.lock || cargo generate-lockfile
 
     cross rustc --bin cloak --target $TARGET --release -- -C lto
 
