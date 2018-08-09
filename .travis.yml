@@ -28,55 +28,69 @@ matrix:
         apt:
           packages:
             - gcc-7
+          sources:
+            - ubuntu-toolchain-r-test
     - env: TARGET=mips64-unknown-linux-gnuabi64
       addons:
         apt:
           packages:
             - gcc-7
+          sources:
+            - ubuntu-toolchain-r-test
     - env: TARGET=mips64el-unknown-linux-gnuabi64
       addons:
         apt:
           packages:
             - gcc-7
+          sources:
+            - ubuntu-toolchain-r-test
     - env: TARGET=mipsel-unknown-linux-gnu
       addons:
         apt:
           packages:
             - gcc-7
+          sources:
+            - ubuntu-toolchain-r-test
     - env: TARGET=powerpc-unknown-linux-gnu
       addons:
         apt:
           packages:
             - gcc-7
+          sources:
+            - ubuntu-toolchain-r-test
     - env: TARGET=powerpc64-unknown-linux-gnu
       addons:
         apt:
           packages:
             - gcc-7
+          sources:
+            - ubuntu-toolchain-r-test
     - env: TARGET=powerpc64le-unknown-linux-gnu
       addons:
         apt:
           packages:
             - gcc-7
+          sources:
+            - ubuntu-toolchain-r-test
     - env: TARGET=s390x-unknown-linux-gnu DISABLE_TESTS=1
       addons:
         apt:
           packages:
             - gcc-7
+          sources:
+            - ubuntu-toolchain-r-test
     - env: TARGET=x86_64-unknown-linux-gnu
       addons:
         apt:
           packages:
             - gcc-7
+          sources:
+            - ubuntu-toolchain-r-test
     - env: TARGET=x86_64-unknown-linux-musl
 
     # OSX
     - env: TARGET=i686-apple-darwin
       os: osx
-      addons:
-        apt:
-          packages:
-            - gcc-7
     - env: TARGET=x86_64-apple-darwin
       os: osx
 
@@ -86,16 +100,22 @@ matrix:
         apt:
           packages:
             - gcc-7
+          sources:
+            - ubuntu-toolchain-r-test
     - env: TARGET=x86_64-unknown-freebsd DISABLE_TESTS=1
       addons:
         apt:
           packages:
             - gcc-7
+          sources:
+            - ubuntu-toolchain-r-test
     - env: TARGET=x86_64-unknown-netbsd DISABLE_TESTS=1
       addons:
         apt:
           packages:
             - gcc-7
+          sources:
+            - ubuntu-toolchain-r-test
 
 before_install:
   - set -e
