@@ -86,7 +86,10 @@ mod tests {
     fn test_is_base32_key() {
         let result = super::is_base32_key(String::from("12123EQ"));
         assert!(result.is_err());
-        assert_eq!(result.err(), Some(String::from("the key is not a valid base32 encoding")));
+        assert_eq!(
+            result.err(),
+            Some(String::from("the key is not a valid base32 encoding"))
+        );
 
         let result = super::is_base32_key(String::from("4AZJFQFIGYM2KMTOO72I6FAOZ6ZFWJR6"));
         assert!(result.is_ok());
