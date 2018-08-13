@@ -97,10 +97,7 @@ impl OTP {
             | (u32::from(digest[offset + 3]) & 0xff);
         let base = self.output_base.len() as u32;
         let hotp_code = snum % base.pow(self.output_len as u32);
-        let mut code = hotp_code.to_string();
-        while code.len() < self.output_len {
-            code = "0".to_owned() + &code;
-        }
+        let code = format!("{:0width$}", hotp_code, width = self.output_len);
         code
     }
 
