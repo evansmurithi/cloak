@@ -9,7 +9,7 @@ readme = "README.md"
 keywords = ["otp", "cli", "authentication"]
 categories = ["command-line-utilities", "authentication"]
 license = "MIT"
-description = "A Command Line OTP Authenticator application."
+description = "A Command Line OTP (One Time Password) Authenticator application."
 
 [dependencies]
 clap = "2.32.0"

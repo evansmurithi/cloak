@@ -1,6 +1,6 @@
 # cloak
 
-A Command Line OTP Authenticator application written in Rust that generates
+A Command Line OTP (One Time Password) Authenticator application written in Rust that generates
 time-based and counter-based OTP codes.
 
 [![Linux build status](https://travis-ci.com/evansmurithi/cloak.svg?branch=master)](https://travis-ci.com/evansmurithi/cloak)
