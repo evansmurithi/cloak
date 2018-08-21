@@ -80,14 +80,6 @@ matrix:
     #       sources:
     #         - ubuntu-toolchain-r-test
     - env: TARGET=x86_64-unknown-linux-gnu
-      addons:
-        apt:
-          packages:
-            - clang-5.0
-            - gcc-7
-          sources:
-            - llvm-toolchain-trusty-5.0
-            - ubuntu-toolchain-r-test
 
     # - env: TARGET=x86_64-unknown-linux-musl
 
