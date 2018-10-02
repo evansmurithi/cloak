@@ -28,6 +28,12 @@ To install `cloak`, you can do either of the following:
     You can download the binaries [here](https://github.com/evansmurithi/cloak/releases).
     Make sure to put the path to the binary into your `PATH`.
 
+    Alternatively, you can install `cloak` via the [scoop package manager](https://scoop.sh) with the following command:
+
+    ```powershell
+    scoop install cloak
+    ```
+
 2. **Crates.io**
 
     Once you've installed Rust, install `cloak` by typing the following in the terminal:
