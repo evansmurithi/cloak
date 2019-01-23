@@ -1,154 +1,115 @@
-dist: trusty
 language: rust
-services: docker
-sudo: required
-
-cache:
-  timeout: 360
-  cargo: true
-
-before_cache:
-  # Travis can't cache files that are not readable by "others"
-  - chmod -R a+r $HOME/.cargo
-
-env:
-  global:
-    - CRATE_NAME=cloak
 
 matrix:
   include:
-    # Linux
-    - env: TARGET=aarch64-unknown-linux-gnu
-    - env: TARGET=arm-unknown-linux-gnueabi
-    - env: TARGET=armv7-unknown-linux-gnueabihf
-    - env: TARGET=i686-unknown-linux-gnu
-    - env: TARGET=i686-unknown-linux-musl
-    - env: TARGET=mips-unknown-linux-gnu
-      addons:
-        apt:
-          packages:
-            - gcc-7
-          sources:
-            - ubuntu-toolchain-r-test
-    - env: TARGET=mips64-unknown-linux-gnuabi64
-      addons:
-        apt:
-          packages:
-            - gcc-7
-          sources:
-            - ubuntu-toolchain-r-test
-    - env: TARGET=mips64el-unknown-linux-gnuabi64
-      addons:
-        apt:
-          packages:
-            - gcc-7
-          sources:
-            - ubuntu-toolchain-r-test
-    - env: TARGET=mipsel-unknown-linux-gnu
-      addons:
-        apt:
-          packages:
-            - gcc-7
-          sources:
-            - ubuntu-toolchain-r-test
-    - env: TARGET=powerpc-unknown-linux-gnu
-      addons:
-        apt:
-          packages:
-            - gcc-7
-          sources:
-            - ubuntu-toolchain-r-test
-    - env: TARGET=powerpc64-unknown-linux-gnu
-      addons:
-        apt:
-          packages:
-            - gcc-7
-          sources:
-            - ubuntu-toolchain-r-test
-    - env: TARGET=powerpc64le-unknown-linux-gnu
-      addons:
-        apt:
-          packages:
-            - gcc-7
-          sources:
-            - ubuntu-toolchain-r-test
-    - env: TARGET=s390x-unknown-linux-gnu DISABLE_TESTS=1
-      addons:
-        apt:
-          packages:
-            - gcc-7
-          sources:
-            - ubuntu-toolchain-r-test
-    - env: TARGET=x86_64-unknown-linux-gnu
-      addons:
-        apt:
-          packages:
-            - gcc-7
-          sources:
-            - ubuntu-toolchain-r-test
-    - env: TARGET=x86_64-unknown-linux-musl
+    # Stable channel.
+    - os: linux
+      rust: stable
+      env: TARGET=x86_64-unknown-linux-gnu
+    - os: linux
+      rust: stable
+      env:
+        - TARGET=x86_64-unknown-linux-musl
+        - CC_x86_64_unknown_linux_musl=/usr/bin/musl-gcc
+    - os: linux
+      rust: stable
+      env: TARGET=i686-unknown-linux-gnu
+    - os: osx
+      rust: stable
+      env: TARGET=x86_64-apple-darwin
+    - os: linux
+      rust: stable
+      env:
+        - TARGET=arm-unknown-linux-gnueabihf
+        - CC_arm_unknown_linux_gnueabihf=/usr/bin/arm-linux-gnueabihf-gcc-4.8
+        - CARGO_TARGET_ARM_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc-4.8
+    - os: linux
+      rust: stable
+      env:
+        - TARGET=aarch64-unknown-linux-gnu
+        - CC_aarch64-unknown-linux-gnu=/usr/bin/aarch64-linux-gnu-gcc-4.8
+        - CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc-4.8
 
-    # OSX
-    - env: TARGET=i686-apple-darwin
-      os: osx
-    - env: TARGET=x86_64-apple-darwin
-      os: osx
+    # Minimum Rust supported channel.
+    - os: linux
+      rust: 1.31.0
+      env: TARGET=x86_64-unknown-linux-gnu
+    - os: linux
+      rust: 1.31.0
+      env:
+        - TARGET=x86_64-unknown-linux-musl
+        - CC_x86_64_unknown_linux_musl=/usr/bin/musl-gcc
+    - os: osx
+      rust: 1.31.0
+      env: TARGET=x86_64-apple-darwin
 
-    # *BSD
-    - env: TARGET=i686-unknown-freebsd DISABLE_TESTS=1
-      addons:
-        apt:
-          packages:
-            - gcc-7
-          sources:
-            - ubuntu-toolchain-r-test
-    - env: TARGET=x86_64-unknown-freebsd DISABLE_TESTS=1
-      addons:
-        apt:
-          packages:
-            - gcc-7
-          sources:
-            - ubuntu-toolchain-r-test
-    - env: TARGET=x86_64-unknown-netbsd DISABLE_TESTS=1
-      addons:
-        apt:
-          packages:
-            - gcc-7
-          sources:
-            - ubuntu-toolchain-r-test
+    # Code formatting and linting check
+    - os: linux
+      rust: nightly
+      # skip the global install step
+      install:
+        - rustup component add rustfmt
+        - rustup component add clippy || cargo install --git https://github.com/rust-lang/rust-clippy/ --force clippy
+      script:
+        - cargo fmt --all -- --check
+        - cargo clippy --all-targets --all-features -- -D warnings
+
+sudo: required
 
 before_install:
-  - set -e
-  - rustup self update
+  - bash ci/before_install.bash
+
+env:
+  global:
+    # Default target on travis-ci.
+    # Used as conditional check in the install stage
+    - HOST=x86_64-unknown-linux-gnu
+    # Used on the deployment script
+    - PROJECT_NAME=cloak
 
 install:
-  - sh ci/install.sh
-  - source ~/.cargo/env || true
+  # prevent target re-add error from rustup
+  - if [[ $TRAVIS_OS_NAME = linux && $HOST != $TARGET ]]; then rustup target add $TARGET; fi
 
 script:
-  - bash ci/script.sh
-
-after_script: set +e
+  - bash ci/script.bash
 
 before_deploy:
-  - sh ci/before_deploy.sh
+  - bash ci/before_deploy.bash
 
 deploy:
-  api_key:
-    secure: Bl+5uacvHcNVrzaY2drsEnL2OH1ETvRWUIW+nO5zHhFO/Wu85EIUjOHpkkFPzEwEsMScbOlRK197cEQhnKIHgyyiK7bMm3MeilIlc+JRUGGpbK3iPhE9M3UrMpPSNdKZbRZWvXPSUQ79DUe+nxav6fNIHTDLSNzSYbHVELpqO5biIeR3nUy5QLvC7nLyz3+xIdYNpGGYZyCXgnX1D6BObfoMXX9VDfog/qD960SZD09Ca7/HyAtDBCG2FjwYrMgsTxE2txQ7LN2GzcPVU4mjkAjNBTP1yE8M4OslNObSwmn2zC/BvxR/dUbN9AHjfNRXbZTVgU0ri7FYtqfjllMohMutoqKyJWrrioFt+a37jEfzuMQfsmClZmg7qy2zIzQIKb9AKN+7DKNiFGwxm6oP1nSgPijnAj9lDD0/9vym/jTCfnQsuUOuA++uEu6K3pvpGX8nzEu/wefDE+Pxduq1dZt2wKnFdFWR8aW5DYdcxNbC8VBTVPZyC0c6HOJNMH7m1OAE2Q2KEwlX6AylwrhRR21BXL08/4eqnVnNzKJu0bkh7/ipVs2MaLqMB0d45KJh940XGkqNtyni14s1gw9WbtZS8EwHGwCosBzu8Ag4lEN3ePGe07EGn+mAUVMSqUJpXgO2v8XYMpfXiIMvR5CJZxhfpSRdWhCnDGK8UvOLYnE=
-  file_glob: true
-  file: $CRATE_NAME-$TRAVIS_TAG-$TARGET.*
-  on:
-    condition: $TRAVIS_RUST_VERSION = stable
-    tags: true
   provider: releases
+  # NOTE updating the `api_key.secure`
+  # - go to: https://github.com/settings/tokens/new
+  # - generate new token using `public_repo` scope
+  # - encrypt it using: `travis encrypt API_KEY_HERE`
+  # - paste the output below
+  api_key:
+    secure: XMRJ/QF+//ozfLCQ6ux2UCy8BFGm0hxPkV1Fh07eGur0Y9dHgDwYlZU//PrG7iRUUkuRBD3aOHEmHEO6EYs8jMCeP/CHKWxXejPIeXW/WlltQmrJsnxAz4BDn+vzM+N0dhYWuiEchR1XOn4AaP6fUTzovybk1fFHpblh75MYh1ph+hQhiU/8yY5ZjVi0oLJ8IomZNRJiRPUozYH2kl+zpn6aHvm8c8iEUZpJ1oT6JTiLH0yzpYUuHkJmgCKK0K2Kd+vQ3Tv10YQ1g77ybLol+xdqeStGjn2qImzZCu0vLHY+zNaTsqF4uXCwvz8wQ/4mDjG2+03nE7LSFcbQFlvcPZ5bR3nTkKmzUp6+ERhseVuj/vMZ4hqsfYJiW3DHys7YzfblBLFNdBXhxm3aEuoqh1aLqT5XR6kHZV3kZ3T0dg1bMxWS24OKB7iU5GNZJxPVpWOSeCYODtx7MxPUF+eLZvY3s0mdrCIYcdz5b89N9qT+s5W63lEaTaKFNLHEd62hICxmGDfrD/S7Q1HMFl9zj7jkZi3LzbR+hO++qXKPORizoee0hPzbuE1Mwn+f5tMgaB3G+LPyakdV5/je9F2WfKBBy/WhSjxytP2Kj4ABeq88lNSmdpZSFoesO9iNHZcNudwzif82iMeuGoIaxGMnXh4kDQ6otpFmo9Lg8w8sHVM=
+  # for uploading multiple files
+  file_glob: true
+  # NOTE explanation on each env variable
+  # - PROJECT_NAME: name of the project, set on the `env.global` above
+  # - TRAVIS_TAG: tag name that the build is being deployed for, usually the version number
+  # - TARGET: target triple of the build
+  file:
+    - $PROJECT_NAME-$TRAVIS_TAG-$TARGET.*
+    - $PROJECT_NAME*.deb
+  # don't delete artifacts from previous stage
   skip_cleanup: true
-
-branches:
-  only:
-    - "/^v\\d+\\.\\d+\\.\\d+.*$/"
-    - master
+  on:
+    # deploy only if we push a tag
+    tags: true
+    # deploy only on stable channel that has TARGET env variable sets
+    condition: $TRAVIS_RUST_VERSION = stable && $TARGET != ""
 
 notifications:
   email:
     on_success: never
+
+# Caching
+cache:
+  directories:
+    - /home/travis/.cargo
+before_cache:
+  - rm -rf /home/travis/.cargo/registry
