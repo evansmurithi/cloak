@@ -2,8 +2,10 @@ use dirs;
 use errors::{Error, Result};
 use std::collections::BTreeMap;
 use std::fs;
+use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
 use toml;
+use vault;
 
 const APP_DIR: &str = ".cloak/";
 const RECOVERY_CODES_DIR: &str = "recovery_codes/";
@@ -19,20 +21,24 @@ pub struct Account {
 }
 
 // Read the contents of the `accounts` file to a map of an `Account` struct
-pub fn read() -> Result<BTreeMap<String, Account>> {
+pub fn read(password: &str) -> Result<BTreeMap<String, Account>> {
     let app_dir = Path::new(&dirs::home_dir().ok_or(Error::HomeDirNotFound)?).join(APP_DIR);
     let file_path = create_file(&app_dir, ACCOUNTS_FILE)?;
-    let accounts_str = fs::read_to_string(file_path)?;
+    let decrypted_accounts = fs::read_to_string(file_path)?;
+    // decrypt accounts
+    let accounts_str = vault::decrypt(&decrypted_accounts, password)?;
     let accounts: BTreeMap<String, Account> = toml::from_str(&accounts_str)?;
     Ok(accounts)
 }
 
 // Write a map of an `Account` struct to the `accounts` file
-pub fn write(accounts: &BTreeMap<String, Account>) -> Result<()> {
+pub fn write(accounts: &BTreeMap<String, Account>, password: &str) -> Result<()> {
     let app_dir = Path::new(&dirs::home_dir().ok_or(Error::HomeDirNotFound)?).join(APP_DIR);
     let file_path = create_file(&app_dir, ACCOUNTS_FILE)?;
     let accounts_str = toml::to_string(accounts)?;
-    fs::write(file_path, accounts_str)?;
+    // encrypt accounts
+    let encrypted_accounts = vault::encrypt(&accounts_str, &password)?;
+    fs::write(file_path, encrypted_accounts)?;
     Ok(())
 }
 

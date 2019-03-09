@@ -9,6 +9,7 @@ extern crate ring;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+extern crate rpassword;
 extern crate toml;
 
 use clap::App;
@@ -17,6 +18,7 @@ mod cmd;
 mod errors;
 mod fs;
 mod otp;
+mod vault;
 
 fn main() {
     // Define list of subcommand for the `cloak` app
@@ -27,6 +29,7 @@ fn main() {
         .subcommand(cmd::add::subcommand())
         .subcommand(cmd::view::subcommand())
         .subcommand(cmd::list::subcommand())
+        .subcommand(cmd::vault::subcommand())
         .subcommand(cmd::delete::subcommand())
         .subcommand(cmd::recovery_codes::subcommand())
         .get_matches();
@@ -35,6 +38,7 @@ fn main() {
         ("add", Some(sub_m)) => cmd::add::run(&sub_m),
         ("view", Some(sub_m)) => cmd::view::run(&sub_m),
         ("list", Some(_)) => cmd::list::run(),
+        ("vault", Some(_)) => cmd::vault::run(),
         ("delete", Some(sub_m)) => cmd::delete::run(&sub_m),
         ("recovery_codes", Some(sub_m)) => cmd::recovery_codes::run(&sub_m),
         _ => eprintln!("No subcommand chosen. Add --help | -h to view the subcommands."),

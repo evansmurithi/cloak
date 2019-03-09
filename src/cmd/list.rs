@@ -1,6 +1,7 @@
 use clap::{App, SubCommand};
 use fs;
 use otp::OTP;
+use rpassword;
 
 // `list` subcommand
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -9,7 +10,8 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
 
 // Implementation for the `list` subcommand
 pub fn run() {
-    match fs::read() {
+    let pass = rpassword::read_password_from_tty(Some("Password: ")).unwrap();
+    match fs::read(&pass) {
         Ok(accounts) => {
             for (name, account) in accounts {
                 let otp = OTP::new(

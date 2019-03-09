@@ -26,6 +26,18 @@ pub enum Error {
 
     #[fail(display = "Could not parse the accounts file: {}", _0)]
     TomlDeserialize(#[cause] de::Error),
+
+    #[fail(display = "Wrong password provided")]
+    WrongPassword,
+
+    #[fail(display = "Error encrypting")]
+    EncryptionError,
+
+    #[fail(display = "Error decrypting")]
+    DecryptionError,
+
+    #[fail(display = "File not vault encrypted")]
+    FileNotEncrypted,
 }
 
 impl From<io::Error> for Error {

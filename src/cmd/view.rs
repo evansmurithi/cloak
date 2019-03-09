@@ -1,6 +1,7 @@
 use clap::{App, Arg, ArgMatches, SubCommand};
 use fs;
 use otp::OTP;
+use rpassword;
 
 // Create arguments for `view` subcommand
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -37,7 +38,8 @@ pub fn run(args: &ArgMatches) {
         None => 6,
     };
     let account_name = args.value_of("account").unwrap();
-    match fs::read() {
+    let pass = rpassword::read_password_from_tty(Some("Password: ")).unwrap();
+    match fs::read(&pass) {
         Ok(accounts) => match accounts.get(account_name) {
             Some(account) => {
                 let otp = OTP::new(

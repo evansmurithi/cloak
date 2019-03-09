@@ -1,6 +1,7 @@
 use clap::{App, Arg, ArgMatches, SubCommand};
 use data_encoding::BASE32_NOPAD;
 use fs;
+use rpassword;
 
 // Create arguments for `add` subcommand
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -57,7 +58,8 @@ pub fn run(args: &ArgMatches) {
     };
     let account_name = args.value_of("account").unwrap();
     let key = args.value_of("key").unwrap().to_uppercase();
-    match fs::read() {
+    let pass = rpassword::read_password_from_tty(Some("Password: ")).unwrap();
+    match fs::read(&pass) {
         Ok(mut accounts) => {
             let mut counter = if !totp { Some(0) } else { None };
             let account = fs::Account {
@@ -71,7 +73,7 @@ pub fn run(args: &ArgMatches) {
                 println!("Account already exists");
             } else {
                 accounts.insert(account_name.to_string(), account);
-                match fs::write(&accounts) {
+                match fs::write(&accounts, &pass) {
                     Ok(_) => println!("Account successfully created"),
                     Err(err) => eprintln!("{}", err),
                 };

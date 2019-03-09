@@ -1,5 +1,6 @@
 use clap::{App, Arg, ArgMatches, SubCommand};
 use fs;
+use rpassword;
 use std::io::{self, Write};
 
 // Create arguments for `delete` subcommand
@@ -22,11 +23,12 @@ pub fn run(args: &ArgMatches) {
     match io::stdin().read_line(&mut answer) {
         Ok(_) => {
             if answer.trim().to_lowercase() == "y" {
-                match fs::read() {
+                let pass = rpassword::read_password_from_tty(Some("Password: ")).unwrap();
+                match fs::read(&pass) {
                     Ok(mut accounts) => {
                         if accounts.get(account_name).is_some() {
                             accounts.remove(account_name);
-                            match fs::write(&accounts) {
+                            match fs::write(&accounts, &pass) {
                                 Ok(_) => println!("Account successfully deleted"),
                                 Err(err) => eprintln!("{}", err),
                             };
