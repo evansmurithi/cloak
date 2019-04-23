@@ -59,7 +59,7 @@ pub fn run(args: &ArgMatches) {
     let key = args.value_of("key").unwrap().to_uppercase();
     match fs::read() {
         Ok(mut accounts) => {
-            let mut counter = if !totp { Some(0) } else { None };
+            let counter = if !totp { Some(0) } else { None };
             let account = fs::Account {
                 key,
                 totp,
