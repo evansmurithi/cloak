@@ -5,6 +5,8 @@ time-based and counter-based OTP codes.
 
 [![Linux build status](https://travis-ci.com/evansmurithi/cloak.svg?branch=master)](https://travis-ci.com/evansmurithi/cloak)
 [![Windows build status](https://ci.appveyor.com/api/projects/status/9mlfpfru3ng4c689?svg=true)](https://ci.appveyor.com/project/evansmurithi/cloak)
+![License](https://img.shields.io/crates/l/cloak.svg)
+[![Crates.io version](https://img.shields.io/crates/v/cloak.svg)](https://crates.io/crates/cloak)
 
 ## Motivation
 
