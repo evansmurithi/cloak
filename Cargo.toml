@@ -1,6 +1,6 @@
 [package]
 name = "cloak"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Evans Murithi <murithievans80@gmail.com>"]
 exclude = ["assets/*"]
 repository = "https://github.com/evansmurithi/cloak"
