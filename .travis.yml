@@ -45,11 +45,11 @@ matrix:
 
     # Code formatting and linting check
     - os: linux
-      rust: nightly
+      rust: stable
       # skip the global install step
       install:
         - rustup component add rustfmt
-        - rustup component add clippy || cargo install --git https://github.com/rust-lang/rust-clippy/ --force clippy
+        - rustup component add clippy
       script:
         - cargo fmt --all -- --check
         - cargo clippy --all-targets --all-features -- -D warnings
@@ -102,6 +102,11 @@ deploy:
     tags: true
     # deploy only on stable channel that has TARGET env variable sets
     condition: $TRAVIS_RUST_VERSION = stable && $TARGET != ""
+
+branches:
+  only:
+    - "/^v\\d+\\.\\d+\\.\\d+.*$/"
+    - master
 
 notifications:
   email:
