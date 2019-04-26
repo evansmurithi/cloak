@@ -1,25 +1,13 @@
 environment:
   global:
-    PROJECT_NAME: cloak
+    RUST_VERSION: stable
+    CRATE_NAME: cloak
+    CARGO_HOME: "c:\\cargo"
+    RUSTUP_HOME: "c:\\rustup"
 
   matrix:
-    # Stable channel
-    - TARGET: i686-pc-windows-msvc
-      RUST_CHANNEL: stable
     - TARGET: x86_64-pc-windows-msvc
-      RUST_CHANNEL: stable
-
-    # Beta channel
     - TARGET: i686-pc-windows-msvc
-      RUST_CHANNEL: beta
-    - TARGET: x86_64-pc-windows-msvc
-      RUST_CHANNEL: beta
-
-    # Nightly channel
-    - TARGET: i686-pc-windows-msvc
-      RUST_CHANNEL: nightly
-    - TARGET: x86_64-pc-windows-msvc
-      RUST_CHANNEL: nightly
 
 # Install Rust and Cargo
 install:
@@ -29,9 +17,9 @@ install:
       } ElseIf ($Env:TARGET -eq 'i686-pc-windows-gnu') {
         $Env:PATH += ';C:\msys64\mingw32\bin'
       }
-  - curl -sSf -o rustup-init.exe https://win.rustup.rs/
-  - rustup-init.exe -y --default-host %TARGET% --default-toolchain %RUST_CHANNEL%
-  - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
+  - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
+  - rustup-init.exe -y --default-host %TARGET% --default-toolchain %RUST_VERSION%
+  - set PATH=%PATH%;C:\cargo\bin
   - rustc -Vv
   - cargo -V
 
@@ -40,37 +28,35 @@ build: false
 
 # Equivalent to Travis' `script` phase
 test_script:
-  - cargo build --verbose
-  - cargo test --verbose
+  - cargo test --target %TARGET% --verbose
+  - cargo run --target %TARGET% -- view test_app
 
 before_deploy:
   # Generate artifacts for release
-  - cargo build --release
-  - mkdir staging
-  - copy target\release\cloak.exe staging
-  - cd staging
-  - 7z a ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%.zip *
-  - appveyor PushArtifact ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%.zip
+  - cargo build --release --verbose
+  - ps: ci\before_deploy.ps1
 
 deploy:
+  description: 'Windows release'
   artifact: /.*\.zip/
+  # Here's how:
+  # - Go to 'https://github.com/settings/tokens/new' and generate a Token with only the
+  # `public_repo` scope enabled
+  # - Then go to 'https://ci.appveyor.com/tools/encrypt' and enter the newly generated token.
+  # - Enter the "encrypted value" below
   auth_token:
     secure: chvt6Gw6dTdrWFr5c1qFmCdylM8Qbk9VDEO4Z5zu/cNg9EhCHYtG98BEIB9WgFxx
-  description: 'Windows release'
-  on:
-    RUST_CHANNEL: stable
-    appveyor_repo_tag: true
   provider: GitHub
+  on:
+    RUST_VERSION: stable
+    appveyor_repo_tag: true
 
 cache:
   - C:\Users\appveyor\.cargo\registry
   - target
 
-branches:
-  only:
-    - "/^v\\d+\\.\\d+\\.\\d+.*$/"
-    - master
-
 notifications:
   - provider: Email
     on_build_success: false
+    on_build_failure: false
+    on_build_status_changed: false

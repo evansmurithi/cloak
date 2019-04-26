@@ -41,6 +41,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
 
 // Validate key provided in arguments is a valid base32 encoding
 fn is_base32_key(value: String) -> Result<(), String> {
+    let value = value.to_uppercase();
     match BASE32_NOPAD.decode(value.as_bytes()) {
         Ok(_) => Ok(()),
         Err(_) => Err(String::from("the key is not a valid base32 encoding")),
@@ -55,12 +56,12 @@ pub fn run(args: &ArgMatches) {
         None => "SHA1",
     };
     let account_name = args.value_of("account").unwrap();
-    let key = args.value_of("key").unwrap();
+    let key = args.value_of("key").unwrap().to_uppercase();
     match fs::read() {
         Ok(mut accounts) => {
-            let mut counter = if !totp { Some(0) } else { None };
+            let counter = if !totp { Some(0) } else { None };
             let account = fs::Account {
-                key: key.to_string(),
+                key,
                 totp,
                 hash_function: hash_function.to_string(),
                 counter,
