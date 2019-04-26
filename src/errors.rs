@@ -15,9 +15,6 @@ pub enum Error {
         cause: Box<DecodeError>,
     },
 
-    #[fail(display = "HOME_DIR could not be found")]
-    HomeDirNotFound,
-
     #[fail(display = "I/O error: {}", _0)]
     Io(#[cause] io::Error),
 

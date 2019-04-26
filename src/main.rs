@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate clap;
 extern crate data_encoding;
-extern crate dirs;
+extern crate dirs as dirs_rs;
 extern crate open;
 #[macro_use]
 extern crate failure;
@@ -10,10 +10,13 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate toml;
+#[macro_use]
+extern crate lazy_static;
 
 use clap::App;
 
 mod cmd;
+mod dirs;
 mod errors;
 mod fs;
 mod otp;
