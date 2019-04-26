@@ -117,6 +117,20 @@ To view the help of any of the subcommands below, add `-h` or `--help`, e.g. `cl
     This will open a file, using your preferred editor, to either save new recovery
     codes or view existing recovery codes.
 
+## Customization
+
+By default `cloak` stores your accounts and recovery codes inside a `.cloak/`
+directory found inside your `$HOME` folder if you are on Linux or macOS, or
+inside your user profile folder if you are on Windows.
+
+To alter this, you can use the `CLOAK_ACCOUNTS_DIR` environment variable to
+point `cloak` to the directory to use for storing your accounts and recovery
+codes:
+
+```bash
+export CLOAK_ACCOUNTS_DIR='/save/accounts/here/'  # absolute path
+```
+
 ## Contributions
 
 If you want to contribute to `cloak` you will have to clone the repository on your
