@@ -23,6 +23,12 @@ dirs = "1.0.2"
 failure = "0.1.1"
 lazy_static = "1.3"
 
+[dev-dependencies]
+assert_cmd = "0.11"
+assert_fs = "0.11"
+escargot = "0.5"
+predicates = "1.0"
+
 [[bin]]
 path = "src/main.rs"
 name = "cloak"
