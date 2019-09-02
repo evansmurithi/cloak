@@ -13,7 +13,7 @@ description = "A Command Line OTP (One Time Password) Authenticator application.
 
 [dependencies]
 clap = "2.33"
-ring = "0.14.6"
+ring = "0.16.9"
 data-encoding = "2.1.1"
 toml = "0.5.0"
 serde = "1.0"
