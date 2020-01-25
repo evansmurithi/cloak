@@ -1,6 +1,6 @@
 use data_encoding::BASE32_NOPAD;
 use errors::{Error, Result};
-use ring::{digest, hmac};
+use ring::hmac;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 // Define the types of hash functions supported
@@ -10,7 +10,6 @@ pub enum HashFunction {
     SHA256,
     SHA384,
     SHA512,
-    SHA512_256,
 }
 
 // Structure representing a One Time Password
@@ -51,7 +50,6 @@ impl OTP {
             "SHA256" => HashFunction::SHA256,
             "SHA384" => HashFunction::SHA384,
             "SHA512" => HashFunction::SHA512,
-            "SHA512_256" => HashFunction::SHA512_256,
             _ => HashFunction::SHA1,
         };
         let otp = OTP {
@@ -79,11 +77,10 @@ impl OTP {
             (counter & 0xff) as u8,
         ];
         let signing_key = match self.hash_function {
-            HashFunction::SHA1 => hmac::SigningKey::new(&digest::SHA1, &self.key),
-            HashFunction::SHA256 => hmac::SigningKey::new(&digest::SHA256, &self.key),
-            HashFunction::SHA384 => hmac::SigningKey::new(&digest::SHA384, &self.key),
-            HashFunction::SHA512 => hmac::SigningKey::new(&digest::SHA512, &self.key),
-            HashFunction::SHA512_256 => hmac::SigningKey::new(&digest::SHA512_256, &self.key),
+            HashFunction::SHA1 => hmac::Key::new(hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY, &self.key),
+            HashFunction::SHA256 => hmac::Key::new(hmac::HMAC_SHA256, &self.key),
+            HashFunction::SHA384 => hmac::Key::new(hmac::HMAC_SHA384, &self.key),
+            HashFunction::SHA512 => hmac::Key::new(hmac::HMAC_SHA512, &self.key),
         };
         let digest = hmac::sign(&signing_key, &message);
         self.encode_digest(digest.as_ref())
@@ -134,7 +131,6 @@ mod tests {
     test_hotp_hash_fn!(test_sha256, "SHA256", "851154");
     test_hotp_hash_fn!(test_sha384, "SHA384", "607946");
     test_hotp_hash_fn!(test_sha512, "SHA512", "377017");
-    test_hotp_hash_fn!(test_sha512_256, "SHA512_256", "171117");
 
     #[test]
     fn test_hotp_default() {

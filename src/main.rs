@@ -24,7 +24,7 @@ mod otp;
 fn main() {
     // Define list of subcommand for the `cloak` app
     let matches = App::new(crate_name!())
-        .author(crate_authors!("\n"))
+        .author("Evans Murithi <murithievans80@gmail.com>")
         .about(crate_description!())
         .version(crate_version!())
         .subcommand(cmd::add::subcommand())

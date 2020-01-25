@@ -33,13 +33,13 @@ pub fn write(accounts: &BTreeMap<String, Account>) -> Result<()> {
 }
 
 // Return the file path containing the recovery codes for the account
-pub fn recovery_codes(account_name: &str) -> Result<(PathBuf)> {
+pub fn recovery_codes(account_name: &str) -> Result<PathBuf> {
     get_file_path(CLOAK_DIRS.recovery_codes_dir(), account_name)
 }
 
 // Given directory and file name, return the entire file path. If file does
 // not exist, create it
-fn get_file_path(dir: &Path, file_name: &str) -> Result<(PathBuf)> {
+fn get_file_path(dir: &Path, file_name: &str) -> Result<PathBuf> {
     fs::create_dir_all(&dir)?;
     let file_path = dir.join(file_name);
     if !file_path.is_file() {
