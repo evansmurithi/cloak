@@ -14,7 +14,7 @@ description = "A Command Line OTP (One Time Password) Authenticator application.
 [dependencies]
 clap = "2.33"
 ring = "0.16.11"
-data-encoding = "2.1.1"
+data-encoding = "2.2.0"
 toml = "0.5.6"
 serde = "1.0.104"
 serde_derive = "1.0.104"
