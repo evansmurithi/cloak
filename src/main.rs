@@ -3,10 +3,9 @@ extern crate clap;
 extern crate data_encoding;
 extern crate dirs as dirs_rs;
 extern crate open;
-#[macro_use]
-extern crate failure;
 extern crate ring;
 extern crate serde;
+extern crate thiserror;
 #[macro_use]
 extern crate serde_derive;
 extern crate toml;
