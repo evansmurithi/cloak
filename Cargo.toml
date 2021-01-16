@@ -12,7 +12,7 @@ license = "MIT"
 description = "A Command Line OTP (One Time Password) Authenticator application."
 
 [dependencies]
-clap = "2.33"
+clap = "2.33.3"
 ring = "0.16.13"
 data-encoding = "2.2.0"
 toml = "0.5.6"
