@@ -69,7 +69,6 @@ SUBCOMMANDS:
     delete            Delete an account
     help              Prints this message or the help of the given subcommand(s)
     list              List OTP for all accounts
-    recovery_codes    View recovery codes for an account
     view              View the OTP for an account
 ```
 
@@ -117,11 +116,6 @@ To view the help of any of the subcommands below, add `-h` or `--help`, e.g. `cl
     $ cloak view github
     Account with the name 'github' does not exist. Consider adding it.
     ```
-
-- `cloak recovery_codes <account>`
-
-    This will open a file, using your preferred editor, to either save new recovery
-    codes or view existing recovery codes.
 
 ## Customization
 
