@@ -32,11 +32,6 @@ pub fn write(accounts: &BTreeMap<String, Account>) -> Result<()> {
     Ok(())
 }
 
-// Return the file path containing the recovery codes for the account
-pub fn recovery_codes(account_name: &str) -> Result<PathBuf> {
-    get_file_path(CLOAK_DIRS.recovery_codes_dir(), account_name)
-}
-
 // Given directory and file name, return the entire file path. If file does
 // not exist, create it
 fn get_file_path(dir: &Path, file_name: &str) -> Result<PathBuf> {

@@ -2,7 +2,6 @@
 extern crate clap;
 extern crate data_encoding;
 extern crate dirs as dirs_rs;
-extern crate open;
 extern crate ring;
 extern crate serde;
 extern crate thiserror;
@@ -30,7 +29,6 @@ fn main() {
         .subcommand(cmd::view::subcommand())
         .subcommand(cmd::list::subcommand())
         .subcommand(cmd::delete::subcommand())
-        .subcommand(cmd::recovery_codes::subcommand())
         .get_matches();
 
     match matches.subcommand() {
@@ -38,7 +36,6 @@ fn main() {
         ("view", Some(sub_m)) => cmd::view::run(&sub_m),
         ("list", Some(_)) => cmd::list::run(),
         ("delete", Some(sub_m)) => cmd::delete::run(&sub_m),
-        ("recovery_codes", Some(sub_m)) => cmd::recovery_codes::run(&sub_m),
         _ => eprintln!("No subcommand chosen. Add --help | -h to view the subcommands."),
     }
 }
