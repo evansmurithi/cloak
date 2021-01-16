@@ -1,5 +1,5 @@
+use account::AccountStore;
 use clap::{App, Arg, ArgMatches, SubCommand};
-use fs;
 use otp::OTP;
 
 // Create arguments for `view` subcommand
@@ -31,35 +31,32 @@ fn is_number(value: String) -> Result<(), String> {
 }
 
 // Implementation for the `view` subcommand
-pub fn run(args: &ArgMatches) {
+pub fn run(args: &ArgMatches, account_store: &mut AccountStore) {
     let length = match args.value_of("length") {
         Some(length) => length.parse::<usize>().unwrap(),
         None => 6,
     };
     let account_name = args.value_of("account").unwrap();
-    match fs::read() {
-        Ok(accounts) => match accounts.get(account_name) {
-            Some(account) => {
-                let otp = OTP::new(
-                    &account.key,
-                    account.totp,
-                    &account.hash_function,
-                    account.counter,
-                    Some(length),
-                );
-                match otp {
-                    Ok(otp) => {
-                        println!("{}", otp.generate());
-                    }
-                    Err(err) => eprintln!("{}", err),
+    match account_store.get(account_name) {
+        Some(account) => {
+            let otp = OTP::new(
+                &account.key,
+                account.totp,
+                &account.hash_function,
+                account.counter,
+                Some(length),
+            );
+            match otp {
+                Ok(otp) => {
+                    println!("{}", otp.generate());
                 }
+                Err(err) => eprintln!("{}", err),
             }
-            None => println!(
-                "Account with the name '{}' does not exist. Consider adding it.",
-                account_name
-            ),
-        },
-        Err(err) => eprintln!("{}", err),
+        }
+        None => println!(
+            "Account with the name '{}' does not exist. Consider adding it.",
+            account_name
+        ),
     };
 }
 

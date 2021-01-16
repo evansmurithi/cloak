@@ -16,6 +16,9 @@ pub enum Error {
         cause: Box<DecodeError>,
     },
 
+    #[error("Cloak directory not found")]
+    CloakDirNotFound,
+
     #[error("I/O error: {}", _0)]
     Io(#[from] io::Error),
 
