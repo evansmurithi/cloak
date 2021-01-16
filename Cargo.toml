@@ -12,22 +12,22 @@ license = "MIT"
 description = "A Command Line OTP (One Time Password) Authenticator application."
 
 [dependencies]
-clap = "2.33"
-ring = "0.16.13"
-data-encoding = "2.2.0"
-toml = "0.5.6"
-serde = "1.0.105"
-serde_derive = "1.0.104"
+clap = "2.33.3"
+ring = "0.16.19"
+data-encoding = "2.3.1"
+toml = "0.5.8"
+serde = "1.0.119"
+serde_derive = "1.0.119"
 open = "1.4.0"
-dirs = "2.0.2"
+dirs = "3.0.1"
 failure = "0.1.7"
 lazy_static = "1.4.0"
 
 [dev-dependencies]
-assert_cmd = "0.11"
-assert_fs = "0.13"
+assert_cmd = "1.0"
+assert_fs = "1.0"
 escargot = "0.5"
-predicates = "1.0"
+predicates = "1.0.6"
 
 [[bin]]
 path = "src/main.rs"

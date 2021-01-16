@@ -5,13 +5,12 @@ extern crate escargot;
 extern crate lazy_static;
 extern crate predicates;
 
-use assert_cmd::prelude::*;
+use assert_cmd::Command;
 use assert_fs::fixture::TempDir;
 use assert_fs::prelude::*;
 use escargot::CargoRun;
 use predicates::prelude::*;
 use std::fs;
-use std::process::Command;
 
 lazy_static! {
     static ref CARGO_RUN: CargoRun = escargot::CargoBuild::new()
@@ -22,7 +21,7 @@ lazy_static! {
 }
 
 fn cloak(temp_dir: &TempDir) -> Command {
-    let mut cmd = CARGO_RUN.command();
+    let mut cmd = Command::from(CARGO_RUN.command());
     cmd.env("CLOAK_ACCOUNTS_DIR", temp_dir.path().to_str().unwrap());
     cmd
 }
@@ -109,8 +108,7 @@ fn delete_account() {
     cloak(&temp_dir)
         .arg("delete")
         .arg("test_app")
-        .with_stdin()
-        .buffer("y\n")
+        .write_stdin("y\n")
         .assert()
         .success()
         .stdout("Are you sure you want to delete test_app [N/y]? Account successfully deleted\n");

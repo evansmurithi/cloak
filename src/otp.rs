@@ -37,14 +37,8 @@ impl OTP {
                 key: key.to_owned(),
                 cause: Box::new(err),
             })?;
-        let counter = match counter {
-            Some(c) => c,
-            None => 0 as u64,
-        };
-        let output_len = match output_len {
-            Some(len) => len,
-            None => 6,
-        };
+        let counter = counter.unwrap_or(0_u64);
+        let output_len = output_len.unwrap_or(6);
         let hash_function = match hash_function {
             "SHA1" => HashFunction::SHA1,
             "SHA256" => HashFunction::SHA256,

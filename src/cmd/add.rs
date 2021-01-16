@@ -51,10 +51,7 @@ fn is_base32_key(value: String) -> Result<(), String> {
 // Implementation for the `add` subcommand
 pub fn run(args: &ArgMatches) {
     let totp = !args.is_present("hotp");
-    let hash_function = match args.value_of("algorithm") {
-        Some(algorithm) => algorithm,
-        None => "SHA1",
-    };
+    let hash_function = args.value_of("algorithm").unwrap_or("SHA1");
     let account_name = args.value_of("account").unwrap();
     let key = args.value_of("key").unwrap().to_uppercase();
     match fs::read() {
