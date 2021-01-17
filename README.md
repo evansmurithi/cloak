@@ -3,8 +3,8 @@
 A Command Line OTP (One Time Password) Authenticator application written in Rust that generates
 time-based and counter-based OTP codes.
 
-[![Linux build status](https://travis-ci.com/evansmurithi/cloak.svg?branch=master)](https://travis-ci.com/evansmurithi/cloak)
-[![Windows build status](https://ci.appveyor.com/api/projects/status/9mlfpfru3ng4c689?svg=true)](https://ci.appveyor.com/project/evansmurithi/cloak)
+![CI](https://github.com/evansmurithi/cloak/workflows/CI/badge.svg)
+[![codecov](https://codecov.io/gh/evansmurithi/cloak/branch/master/graph/badge.svg?token=Y72C1MM1E8)](https://codecov.io/gh/evansmurithi/cloak)
 ![License](https://img.shields.io/crates/l/cloak.svg)
 [![Crates.io version](https://img.shields.io/crates/v/cloak.svg)](https://crates.io/crates/cloak)
 
