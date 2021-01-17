@@ -112,3 +112,27 @@ jobs:
         with:
           command: fmt
           args: --all -- --check
+  coverage:
+    name: Coverage
+    needs:
+      - prepare
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Coverage
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          args: --timeout 300 --output-dir coverage
+      - name: Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          directory: coverage
