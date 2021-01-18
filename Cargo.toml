@@ -19,7 +19,7 @@ toml = "0.5.8"
 serde = "1.0.119"
 serde_derive = "1.0.119"
 open = "1.4.0"
-dirs = "3.0.1"
+dirs-next = "2.0.0"
 thiserror = "1.0.23"
 lazy_static = "1.4.0"
 

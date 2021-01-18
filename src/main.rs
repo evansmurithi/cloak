@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate clap;
 extern crate data_encoding;
-extern crate dirs as dirs_rs;
+extern crate dirs_next;
 extern crate ring;
 extern crate serde;
 extern crate thiserror;
