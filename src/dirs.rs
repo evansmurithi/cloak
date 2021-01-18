@@ -1,4 +1,4 @@
-use dirs_rs;
+use dirs_next;
 use std::env;
 use std::path::{Path, PathBuf};
 
@@ -12,7 +12,7 @@ impl CloakAppDirs {
             .ok()
             .map(PathBuf::from)
             .filter(|acc_dir| acc_dir.is_absolute())
-            .or_else(|| dirs_rs::home_dir().map(|d| d.join(".cloak/")))?;
+            .or_else(|| dirs_next::home_dir().map(|d| d.join(".cloak/")))?;
 
         Some(CloakAppDirs { accounts_dir })
     }
