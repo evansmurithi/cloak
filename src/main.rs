@@ -11,12 +11,13 @@ extern crate toml;
 #[macro_use]
 extern crate lazy_static;
 
+use account::AccountStore;
 use clap::App;
 
+mod account;
 mod cmd;
 mod dirs;
 mod errors;
-mod fs;
 mod otp;
 
 fn main() {
@@ -31,11 +32,13 @@ fn main() {
         .subcommand(cmd::delete::subcommand())
         .get_matches();
 
+    let mut account_store = AccountStore::new().expect("Unable to initialize store");
+
     match matches.subcommand() {
-        ("add", Some(sub_m)) => cmd::add::run(&sub_m),
-        ("view", Some(sub_m)) => cmd::view::run(&sub_m),
-        ("list", Some(_)) => cmd::list::run(),
-        ("delete", Some(sub_m)) => cmd::delete::run(&sub_m),
+        ("add", Some(sub_m)) => cmd::add::run(&sub_m, &mut account_store),
+        ("view", Some(sub_m)) => cmd::view::run(&sub_m, &mut account_store),
+        ("list", Some(_)) => cmd::list::run(&mut account_store),
+        ("delete", Some(sub_m)) => cmd::delete::run(&sub_m, &mut account_store),
         _ => eprintln!("No subcommand chosen. Add --help | -h to view the subcommands."),
     }
 }

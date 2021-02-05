@@ -1,6 +1,6 @@
+use account::{Account, AccountStore};
 use clap::{App, Arg, ArgMatches, SubCommand};
 use data_encoding::BASE32_NOPAD;
-use fs;
 
 // Create arguments for `add` subcommand
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -49,33 +49,29 @@ fn is_base32_key(value: String) -> Result<(), String> {
 }
 
 // Implementation for the `add` subcommand
-pub fn run(args: &ArgMatches) {
+pub fn run(args: &ArgMatches, account_store: &mut AccountStore) {
     let totp = !args.is_present("hotp");
     let hash_function = args.value_of("algorithm").unwrap_or("SHA1");
     let account_name = args.value_of("account").unwrap();
     let key = args.value_of("key").unwrap().to_uppercase();
-    match fs::read() {
-        Ok(mut accounts) => {
-            let counter = if !totp { Some(0) } else { None };
-            let account = fs::Account {
-                key,
-                totp,
-                hash_function: hash_function.to_string(),
-                counter,
-            };
 
-            if accounts.get(account_name).is_some() {
-                println!("Account already exists");
-            } else {
-                accounts.insert(account_name.to_string(), account);
-                match fs::write(&accounts) {
-                    Ok(_) => println!("Account successfully created"),
-                    Err(err) => eprintln!("{}", err),
-                };
-            }
-        }
-        Err(err) => eprintln!("{}", err),
+    let counter = if !totp { Some(0) } else { None };
+    let account = Account {
+        key,
+        totp,
+        hash_function: hash_function.to_string(),
+        counter,
     };
+
+    if account_store.get(account_name).is_some() {
+        println!("Account already exists");
+    } else {
+        account_store.add(account_name.to_string(), account);
+        match account_store.save() {
+            Ok(_) => println!("Account successfully created"),
+            Err(err) => eprintln!("{}", err),
+        }
+    }
 }
 
 #[cfg(test)]
