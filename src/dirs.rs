@@ -27,16 +27,16 @@ fn create_file(file_path: &Path) -> Result<()> {
     use std::os::unix::fs::OpenOptionsExt;
     let mut options = fs::OpenOptions::new();
     options.mode(0o600);
-    let _ = options.write(true).create_new(true).open(file_path);
+    options.write(true).create_new(true).open(file_path)?;
     Ok(())
 }
 
 #[cfg(not(unix))]
 fn create_file(file_path: &Path) -> Result<()> {
-    let _ = fs::OpenOptions::new()
+    fs::OpenOptions::new()
         .write(true)
         .create_new(true)
-        .open(file_path);
+        .open(file_path)?;
     Ok(())
 }
 
