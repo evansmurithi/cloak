@@ -1,6 +1,6 @@
 use account::AccountStore;
 use clap::{App, Arg, ArgMatches, SubCommand};
-use otp::OTP;
+use otp::OneTimePassword;
 
 // Create arguments for `view` subcommand
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -39,7 +39,7 @@ pub fn run(args: &ArgMatches, account_store: &mut AccountStore) {
     let account_name = args.value_of("account").unwrap();
     match account_store.get(account_name) {
         Some(account) => {
-            let otp = OTP::new(
+            let otp = OneTimePassword::new(
                 &account.key,
                 account.totp,
                 &account.hash_function,

@@ -1,6 +1,6 @@
 use account::AccountStore;
 use clap::{App, SubCommand};
-use otp::OTP;
+use otp::OneTimePassword;
 
 // `list` subcommand
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -12,7 +12,7 @@ pub fn run(account_store: &mut AccountStore) {
     let accounts = account_store.list();
 
     for (name, account) in accounts {
-        let otp = OTP::new(
+        let otp = OneTimePassword::new(
             &account.key,
             account.totp,
             &account.hash_function,

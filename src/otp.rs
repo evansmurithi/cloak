@@ -6,15 +6,15 @@ use std::time::{SystemTime, UNIX_EPOCH};
 // Define the types of hash functions supported
 #[derive(Debug)]
 pub enum HashFunction {
-    SHA1,
-    SHA256,
-    SHA384,
-    SHA512,
+    Sha1,
+    Sha256,
+    Sha384,
+    Sha512,
 }
 
 // Structure representing a One Time Password
 #[derive(Debug)]
-pub struct OTP {
+pub struct OneTimePassword {
     key: Vec<u8>,
     counter: u64,
     totp: bool,
@@ -23,14 +23,14 @@ pub struct OTP {
     hash_function: HashFunction,
 }
 
-impl OTP {
+impl OneTimePassword {
     pub fn new(
         key: &str,
         totp: bool,
         hash_function: &str,
         counter: Option<u64>,
         output_len: Option<usize>,
-    ) -> Result<OTP> {
+    ) -> Result<OneTimePassword> {
         let decoded_key = BASE32_NOPAD
             .decode(key.as_bytes())
             .map_err(|err| Error::KeyDecode {
@@ -40,13 +40,13 @@ impl OTP {
         let counter = counter.unwrap_or(0_u64);
         let output_len = output_len.unwrap_or(6);
         let hash_function = match hash_function {
-            "SHA1" => HashFunction::SHA1,
-            "SHA256" => HashFunction::SHA256,
-            "SHA384" => HashFunction::SHA384,
-            "SHA512" => HashFunction::SHA512,
-            _ => HashFunction::SHA1,
+            "SHA1" => HashFunction::Sha1,
+            "SHA256" => HashFunction::Sha256,
+            "SHA384" => HashFunction::Sha384,
+            "SHA512" => HashFunction::Sha512,
+            _ => HashFunction::Sha1,
         };
-        let otp = OTP {
+        let otp = OneTimePassword {
             key: decoded_key,
             counter,
             totp,
@@ -71,10 +71,10 @@ impl OTP {
             (counter & 0xff) as u8,
         ];
         let signing_key = match self.hash_function {
-            HashFunction::SHA1 => hmac::Key::new(hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY, &self.key),
-            HashFunction::SHA256 => hmac::Key::new(hmac::HMAC_SHA256, &self.key),
-            HashFunction::SHA384 => hmac::Key::new(hmac::HMAC_SHA384, &self.key),
-            HashFunction::SHA512 => hmac::Key::new(hmac::HMAC_SHA512, &self.key),
+            HashFunction::Sha1 => hmac::Key::new(hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY, &self.key),
+            HashFunction::Sha256 => hmac::Key::new(hmac::HMAC_SHA256, &self.key),
+            HashFunction::Sha384 => hmac::Key::new(hmac::HMAC_SHA384, &self.key),
+            HashFunction::Sha512 => hmac::Key::new(hmac::HMAC_SHA512, &self.key),
         };
         let digest = hmac::sign(&signing_key, &message);
         self.encode_digest(digest.as_ref())
@@ -108,14 +108,14 @@ impl OTP {
 
 #[cfg(test)]
 mod tests {
-    use super::OTP;
+    use super::OneTimePassword;
 
     macro_rules! test_hotp_hash_fn {
         ($func:ident, $hf:expr, $c:tt) => {
             #[test]
             fn $func() {
                 let key = "4AZJFQFIGYM2KMTOO72I6FAOZ6ZFWJR6";
-                let hotp = OTP::new(key, false, $hf, None, None).unwrap();
+                let hotp = OneTimePassword::new(key, false, $hf, None, None).unwrap();
                 assert_eq!(hotp.generate(), $c);
             }
         };
@@ -129,7 +129,7 @@ mod tests {
     #[test]
     fn test_hotp_default() {
         let key = "4AZJFQFIGYM2KMTOO72I6FAOZ6ZFWJR6";
-        let hotp = OTP::new(key, false, "SHA1", None, None).unwrap();
+        let hotp = OneTimePassword::new(key, false, "SHA1", None, None).unwrap();
         assert_eq!(hotp.counter, 0);
         let code = hotp.generate();
         assert_eq!(code.len(), 6);
@@ -139,7 +139,7 @@ mod tests {
     #[test]
     fn test_hotp_given_counter_and_length() {
         let key = "4AZJFQFIGYM2KMTOO72I6FAOZ6ZFWJR6";
-        let hotp = OTP::new(key, false, "SHA1", Some(1), Some(8)).unwrap();
+        let hotp = OneTimePassword::new(key, false, "SHA1", Some(1), Some(8)).unwrap();
         let code = hotp.generate();
         assert_eq!(code.len(), 8);
         assert_eq!(code, "34863669");
