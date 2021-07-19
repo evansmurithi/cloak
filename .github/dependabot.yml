@@ -6,10 +6,3 @@ updates:
     interval: daily
     time: "02:00"
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: escargot
-    versions:
-    - 0.5.2
-  - dependency-name: open
-    versions:
-    - 1.5.0
