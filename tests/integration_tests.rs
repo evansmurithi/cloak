@@ -60,10 +60,7 @@ fn add_account() {
         .assert()
         .success()
         .stdout("Account successfully created\n");
-    assert_eq!(
-        true,
-        predicates::path::is_file().eval(&temp_dir.path().join("accounts"))
-    );
+    assert!(predicates::path::is_file().eval(&temp_dir.path().join("accounts")));
     temp_dir.close().unwrap();
 }
 
@@ -118,5 +115,8 @@ fn delete_account() {
             .unwrap()
             .is_empty()
     );
+    assert!(fs::read_to_string(&temp_dir.path().join("accounts"))
+        .unwrap()
+        .is_empty());
     temp_dir.close().unwrap();
 }
