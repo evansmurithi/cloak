@@ -109,12 +109,6 @@ fn delete_account() {
         .assert()
         .success()
         .stdout("Are you sure you want to delete test_app [N/y]? Account successfully deleted\n");
-    assert_eq!(
-        true,
-        fs::read_to_string(&temp_dir.path().join("accounts"))
-            .unwrap()
-            .is_empty()
-    );
     assert!(fs::read_to_string(&temp_dir.path().join("accounts"))
         .unwrap()
         .is_empty());
