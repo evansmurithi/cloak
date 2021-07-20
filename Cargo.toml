@@ -20,7 +20,7 @@ serde = "1.0.125"
 serde_derive = "1.0.119"
 open = "1.7.0"
 dirs-next = "2.0.0"
-thiserror = "1.0.24"
+thiserror = "1.0.26"
 lazy_static = "1.4.0"
 
 [dev-dependencies]
