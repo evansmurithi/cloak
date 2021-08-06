@@ -23,7 +23,7 @@ thiserror = "1.0.26"
 lazy_static = "1.4.0"
 
 [dev-dependencies]
-assert_cmd = "1.0"
+assert_cmd = "2.0"
 assert_fs = "1.0"
 escargot = "0.5"
 predicates = "2.0.1"
