@@ -26,7 +26,7 @@ lazy_static = "1.4.0"
 assert_cmd = "2.0"
 assert_fs = "1.0"
 escargot = "0.5"
-predicates = "2.0.1"
+predicates = "2.0.2"
 
 [[bin]]
 path = "src/main.rs"
