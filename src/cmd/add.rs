@@ -23,11 +23,7 @@ pub fn subcommand<'a>() -> App<'a> {
                 .conflicts_with("hotp")
                 .help("Time based account (default)"),
         )
-        .arg(
-            Arg::new("hotp")
-                .long("hotp")
-                .help("Counter based account"),
-        )
+        .arg(Arg::new("hotp").long("hotp").help("Counter based account"))
         .arg(
             Arg::new("algorithm")
                 .short('a')

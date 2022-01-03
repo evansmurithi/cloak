@@ -4,13 +4,11 @@ use std::io::{self, Write};
 
 // Create arguments for `delete` subcommand
 pub fn subcommand<'a>() -> App<'a> {
-    App::new("delete")
-        .about("Delete an account")
-        .arg(
-            Arg::new("account")
-                .required(true)
-                .help("Name of the account"),
-        )
+    App::new("delete").about("Delete an account").arg(
+        Arg::new("account")
+            .required(true)
+            .help("Name of the account"),
+    )
 }
 
 // Implementation for the `delete` subcommand
