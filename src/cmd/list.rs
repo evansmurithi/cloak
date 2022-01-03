@@ -3,7 +3,7 @@ use clap::App;
 use otp::OneTimePassword;
 
 // `list` subcommand
-pub fn subcommand<'a, 'b>() -> App<'a> {
+pub fn subcommand<'a>() -> App<'a> {
     App::new("list").about("List OTP for all accounts")
 }
 

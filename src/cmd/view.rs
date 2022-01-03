@@ -3,7 +3,7 @@ use clap::{App, Arg, ArgMatches};
 use otp::OneTimePassword;
 
 // Create arguments for `view` subcommand
-pub fn subcommand<'a, 'b>() -> App<'a> {
+pub fn subcommand<'a>() -> App<'a> {
     App::new("view")
         .about("View the OTP for an account")
         .arg(

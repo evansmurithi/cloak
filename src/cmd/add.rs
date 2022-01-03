@@ -3,7 +3,7 @@ use clap::{App, Arg, ArgMatches};
 use data_encoding::BASE32_NOPAD;
 
 // Create arguments for `add` subcommand
-pub fn subcommand<'a, 'b>() -> App<'a> {
+pub fn subcommand<'a>() -> App<'a> {
     App::new("add")
         .about("Add a new account")
         .arg(

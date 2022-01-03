@@ -3,7 +3,7 @@ use clap::{App, Arg, ArgMatches};
 use std::io::{self, Write};
 
 // Create arguments for `delete` subcommand
-pub fn subcommand<'a, 'b>() -> App<'a> {
+pub fn subcommand<'a>() -> App<'a> {
     App::new("delete")
         .about("Delete an account")
         .arg(
