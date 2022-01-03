@@ -1,19 +1,19 @@
 use account::AccountStore;
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{App, Arg, ArgMatches};
 use otp::OneTimePassword;
 
 // Create arguments for `view` subcommand
-pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
-    SubCommand::with_name("view")
+pub fn subcommand<'a>() -> App<'a> {
+    App::new("view")
         .about("View the OTP for an account")
         .arg(
-            Arg::with_name("account")
+            Arg::new("account")
                 .required(true)
                 .help("Name of the account"),
         )
         .arg(
-            Arg::with_name("length")
-                .short("l")
+            Arg::new("length")
+                .short('l')
                 .long("length")
                 .takes_value(true)
                 .value_name("NUMBER")
@@ -23,7 +23,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
 }
 
 // Validate length provided in arguments is a number
-fn is_number(value: String) -> Result<(), String> {
+fn is_number(value: &str) -> Result<(), String> {
     match value.parse::<usize>() {
         Ok(_) => Ok(()),
         Err(_) => Err(String::from("length must be a number")),
@@ -64,11 +64,11 @@ pub fn run(args: &ArgMatches, account_store: &mut AccountStore) {
 mod tests {
     #[test]
     fn test_is_number() {
-        let result = super::is_number(String::from("meow"));
+        let result = super::is_number("meow");
         assert!(result.is_err());
         assert_eq!(result.err(), Some(String::from("length must be a number")));
 
-        let result = super::is_number(String::from("8"));
+        let result = super::is_number("8");
         assert!(result.is_ok());
         assert_eq!(result.ok(), Some(()));
     }

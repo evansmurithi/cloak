@@ -1,10 +1,10 @@
 use account::AccountStore;
-use clap::{App, SubCommand};
+use clap::App;
 use otp::OneTimePassword;
 
 // `list` subcommand
-pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
-    SubCommand::with_name("list").about("List OTP for all accounts")
+pub fn subcommand<'a>() -> App<'a> {
+    App::new("list").about("List OTP for all accounts")
 }
 
 // Implementation for the `list` subcommand

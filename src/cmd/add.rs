@@ -1,36 +1,32 @@
 use account::{Account, AccountStore};
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{App, Arg, ArgMatches};
 use data_encoding::BASE32_NOPAD;
 
 // Create arguments for `add` subcommand
-pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
-    SubCommand::with_name("add")
+pub fn subcommand<'a>() -> App<'a> {
+    App::new("add")
         .about("Add a new account")
         .arg(
-            Arg::with_name("account")
+            Arg::new("account")
                 .required(true)
                 .help("Name of the account"),
         )
         .arg(
-            Arg::with_name("key")
+            Arg::new("key")
                 .required(true)
                 .help("Secret key of the OTP")
                 .validator(is_base32_key),
         )
         .arg(
-            Arg::with_name("totp")
+            Arg::new("totp")
                 .long("totp")
                 .conflicts_with("hotp")
                 .help("Time based account (default)"),
         )
+        .arg(Arg::new("hotp").long("hotp").help("Counter based account"))
         .arg(
-            Arg::with_name("hotp")
-                .long("hotp")
-                .help("Counter based account"),
-        )
-        .arg(
-            Arg::with_name("algorithm")
-                .short("a")
+            Arg::new("algorithm")
+                .short('a')
                 .long("algorithm")
                 .takes_value(true)
                 .possible_values(&["SHA1", "SHA256", "SHA384", "SHA512", "SHA512_256"])
@@ -40,7 +36,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
 }
 
 // Validate key provided in arguments is a valid base32 encoding
-fn is_base32_key(value: String) -> Result<(), String> {
+fn is_base32_key(value: &str) -> Result<(), String> {
     let value = value.to_uppercase();
     match BASE32_NOPAD.decode(value.as_bytes()) {
         Ok(_) => Ok(()),
@@ -78,14 +74,14 @@ pub fn run(args: &ArgMatches, account_store: &mut AccountStore) {
 mod tests {
     #[test]
     fn test_is_base32_key() {
-        let result = super::is_base32_key(String::from("12123EQ"));
+        let result = super::is_base32_key("12123EQ");
         assert!(result.is_err());
         assert_eq!(
             result.err(),
             Some(String::from("the key is not a valid base32 encoding"))
         );
 
-        let result = super::is_base32_key(String::from("4AZJFQFIGYM2KMTOO72I6FAOZ6ZFWJR6"));
+        let result = super::is_base32_key("4AZJFQFIGYM2KMTOO72I6FAOZ6ZFWJR6");
         assert!(result.is_ok());
         assert_eq!(result.ok(), Some(()));
     }

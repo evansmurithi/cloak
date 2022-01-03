@@ -1,16 +1,14 @@
 use account::AccountStore;
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{App, Arg, ArgMatches};
 use std::io::{self, Write};
 
 // Create arguments for `delete` subcommand
-pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
-    SubCommand::with_name("delete")
-        .about("Delete an account")
-        .arg(
-            Arg::with_name("account")
-                .required(true)
-                .help("Name of the account"),
-        )
+pub fn subcommand<'a>() -> App<'a> {
+    App::new("delete").about("Delete an account").arg(
+        Arg::new("account")
+            .required(true)
+            .help("Name of the account"),
+    )
 }
 
 // Implementation for the `delete` subcommand
