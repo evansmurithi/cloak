@@ -1,4 +1,3 @@
-use dirs_next;
 use crate::errors::{Error, Result};
 use std::env;
 use std::fs;

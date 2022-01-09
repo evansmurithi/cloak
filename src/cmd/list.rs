@@ -1,6 +1,6 @@
 use crate::account::AccountStore;
-use clap::App;
 use crate::otp::OneTimePassword;
+use clap::App;
 
 // `list` subcommand
 pub fn subcommand<'a>() -> App<'a> {

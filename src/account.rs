@@ -2,7 +2,6 @@ use crate::dirs::CLOAK_ACCOUNTS_FILE_PATH;
 use crate::errors::Result;
 use std::collections::BTreeMap;
 use std::fs;
-use toml;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Account {
