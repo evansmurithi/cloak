@@ -1,5 +1,5 @@
 use dirs_next;
-use errors::{Error, Result};
+use crate::errors::{Error, Result};
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};

@@ -1,5 +1,5 @@
 use data_encoding::BASE32_NOPAD;
-use errors::{Error, Result};
+use crate::errors::{Error, Result};
 use ring::hmac;
 use std::time::{SystemTime, UNIX_EPOCH};
 

@@ -1,4 +1,4 @@
-use account::{Account, AccountStore};
+use crate::account::{Account, AccountStore};
 use clap::{App, Arg, ArgMatches};
 use data_encoding::BASE32_NOPAD;
 
