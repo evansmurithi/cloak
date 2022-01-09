@@ -10,7 +10,7 @@ extern crate toml;
 #[macro_use]
 extern crate lazy_static;
 
-use account::AccountStore;
+use crate::account::AccountStore;
 use clap::app_from_crate;
 
 mod account;

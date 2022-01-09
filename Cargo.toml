@@ -10,6 +10,7 @@ keywords = ["otp", "cli", "authentication"]
 categories = ["command-line-utilities", "authentication"]
 license = "MIT"
 description = "A Command Line OTP (One Time Password) Authenticator application."
+edition = "2018"
 
 [dependencies]
 clap = { version = "3.0.4", features = ["cargo", "wrap_help"] }

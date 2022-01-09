@@ -1,6 +1,6 @@
-use account::AccountStore;
+use crate::account::AccountStore;
+use crate::otp::OneTimePassword;
 use clap::{App, Arg, ArgMatches};
-use otp::OneTimePassword;
 
 // Create arguments for `view` subcommand
 pub fn subcommand<'a>() -> App<'a> {
