@@ -1,0 +1,130 @@
+# Borrowed from https://github.com/BurntSushi/ripgrep
+#
+# The way this works is the following:
+#
+# The create-release job runs purely to initialize the GitHub release itself
+# and to output upload_url for the following job.
+#
+# The build-release job runs only once create-release is finished. It gets the
+# release upload URL from create-release job outputs, then builds the release
+# executables for each supported platform and attaches them as release assets
+# to the previously created release.
+#
+# The key here is that we create the release only once.
+#
+# Reference:
+# https://eugene-babichenko.github.io/blog/2020/05/09/github-actions-cross-platform-auto-releases/
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  create-release:
+    name: create-release
+    runs-on: ubuntu-latest
+    # env:
+      # Set to force version number, e.g., when no tag exists.
+      # CLOAK_VERSION: TEST-0.0.0
+    outputs:
+      upload_url: ${{ steps.release.outputs.upload_url }}
+      cloak_version: ${{ env.CLOAK_VERSION }}
+    steps:
+      - name: Get the release version from the tag
+        shell: bash
+        if: env.CLOAK_VERSION == ''
+        run: |
+          # Apparently, this is the right way to get a tag name. Really?
+          #
+          # See: https://github.community/t5/GitHub-Actions/How-to-get-just-the-tag-name/m-p/32167/highlight/true#M1027
+          echo "CLOAK_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          echo "version is: ${{ env.CLOAK_VERSION }}"
+      - name: Create GitHub release
+        id: release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.CLOAK_VERSION }}
+          release_name: ${{ env.CLOAK_VERSION }}
+
+  build-release:
+    name: build-release
+    needs: ['create-release']
+    runs-on: ${{ matrix.os }}
+    env:
+      TARGET_DIR: ./target
+    strategy:
+      matrix:
+        build:
+          - linux
+          - macos
+          - win-msvc
+          - win32-msvc
+        include:
+        - build: linux
+          os: ubuntu-latest
+          rust: stable
+          target: x86_64-unknown-linux-gnu
+        - build: macos
+          os: macos-latest
+          rust: stable
+          target: x86_64-apple-darwin
+        - build: win-msvc
+          os: windows-latest
+          rust: stable
+          target: x86_64-pc-windows-msvc
+        - build: win32-msvc
+          os: windows-latest
+          rust: stable
+          target: i686-pc-windows-msvc
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Install linker
+        if: matrix.target == 'i686-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install gcc-9-multilib lib32gcc-9-dev
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          target: ${{ matrix.target }}
+          override: true
+      - name: Build release binary
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --verbose --release --target ${{ matrix.target }} --target-dir ${{ env.TARGET_DIR }}
+      - name: Strip release binary (linux and macos)
+        if: matrix.build == 'linux' || matrix.build == 'macos'
+        run: strip "target/${{ matrix.target }}/release/cloak"
+      - name: Build archive
+        shell: bash
+        run: |
+          staging="cloak-${{ needs.create-release.outputs.cloak_version }}-${{ matrix.target }}"
+          cp {README.md,LICENSE} "$staging/"
+
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            cp "target/${{ matrix.target }}/release/cloak.exe" "$staging/"
+            7z a "$staging.zip" "$staging"
+            echo "ASSET=$staging.zip" >> $GITHUB_ENV
+          else
+            cp "target/${{ matrix.target }}/release/cloak" "$staging/"
+            tar czf "$staging.tar.gz" "$staging"
+            echo "ASSET=$staging.tar.gz" >> $GITHUB_ENV
+          fi
+      - name: Upload release archive
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ${{ env.ASSET }}
+          asset_name: ${{ env.ASSET }}
+          asset_content_type: application/octet-stream
