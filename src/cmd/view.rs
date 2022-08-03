@@ -1,10 +1,10 @@
 use crate::account::AccountStore;
 use crate::otp::OneTimePassword;
-use clap::{App, Arg, ArgMatches};
+use clap::{value_parser, Arg, ArgMatches, Command};
 
 // Create arguments for `view` subcommand
-pub fn subcommand<'a>() -> App<'a> {
-    App::new("view")
+pub fn subcommand<'a>() -> Command<'a> {
+    Command::new("view")
         .about("View the OTP for an account")
         .arg(
             Arg::new("account")
@@ -17,26 +17,16 @@ pub fn subcommand<'a>() -> App<'a> {
                 .long("length")
                 .takes_value(true)
                 .value_name("NUMBER")
+                .default_value("6")
                 .help("Length of the OTP")
-                .validator(is_number),
+                .value_parser(value_parser!(usize)),
         )
-}
-
-// Validate length provided in arguments is a number
-fn is_number(value: &str) -> Result<(), String> {
-    match value.parse::<usize>() {
-        Ok(_) => Ok(()),
-        Err(_) => Err(String::from("length must be a number")),
-    }
 }
 
 // Implementation for the `view` subcommand
 pub fn run(args: &ArgMatches, account_store: &mut AccountStore) {
-    let length = match args.value_of("length") {
-        Some(length) => length.parse::<usize>().unwrap(),
-        None => 6,
-    };
-    let account_name = args.value_of("account").unwrap();
+    let length = args.get_one::<usize>("length").unwrap();
+    let account_name = args.get_one::<String>("account").unwrap();
     match account_store.get(account_name) {
         Some(account) => {
             let otp = OneTimePassword::new(
@@ -44,7 +34,7 @@ pub fn run(args: &ArgMatches, account_store: &mut AccountStore) {
                 account.totp,
                 &account.hash_function,
                 account.counter,
-                Some(length),
+                Some(*length),
             );
             match otp {
                 Ok(otp) => {
@@ -58,18 +48,4 @@ pub fn run(args: &ArgMatches, account_store: &mut AccountStore) {
             account_name
         ),
     };
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn test_is_number() {
-        let result = super::is_number("meow");
-        assert!(result.is_err());
-        assert_eq!(result.err(), Some(String::from("length must be a number")));
-
-        let result = super::is_number("8");
-        assert!(result.is_ok());
-        assert_eq!(result.ok(), Some(()));
-    }
 }

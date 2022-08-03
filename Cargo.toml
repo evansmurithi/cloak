@@ -13,14 +13,14 @@ description = "A Command Line OTP (One Time Password) Authenticator application.
 edition = "2018"
 
 [dependencies]
-clap = { version = "3.0.13", features = ["cargo", "wrap_help"] }
+clap = { version = "3.2.2", features = ["cargo", "wrap_help"] }
 ring = "0.16.20"
 data-encoding = "2.3.2"
-toml = "0.5.8"
-serde = "1.0.136"
+toml = "0.5.9"
+serde = "1.0.141"
 serde_derive = "1.0.119"
 dirs-next = "2.0.0"
-thiserror = "1.0.30"
+thiserror = "1.0.31"
 lazy_static = "1.4.0"
 
 [dev-dependencies]

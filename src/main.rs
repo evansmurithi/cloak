@@ -11,7 +11,7 @@ extern crate toml;
 extern crate lazy_static;
 
 use crate::account::AccountStore;
-use clap::app_from_crate;
+use clap::command;
 
 mod account;
 mod cmd;
@@ -21,7 +21,7 @@ mod otp;
 
 fn main() {
     // Define list of subcommand for the `cloak` app
-    let matches = app_from_crate!()
+    let matches = command!()
         .subcommand(cmd::add::subcommand())
         .subcommand(cmd::view::subcommand())
         .subcommand(cmd::list::subcommand())

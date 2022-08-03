@@ -1,10 +1,10 @@
 use crate::account::AccountStore;
-use clap::{App, Arg, ArgMatches};
+use clap::{Arg, ArgMatches, Command};
 use std::io::{self, Write};
 
 // Create arguments for `delete` subcommand
-pub fn subcommand<'a>() -> App<'a> {
-    App::new("delete").about("Delete an account").arg(
+pub fn subcommand<'a>() -> Command<'a> {
+    Command::new("delete").about("Delete an account").arg(
         Arg::new("account")
             .required(true)
             .help("Name of the account"),
@@ -13,7 +13,7 @@ pub fn subcommand<'a>() -> App<'a> {
 
 // Implementation for the `delete` subcommand
 pub fn run(args: &ArgMatches, account_store: &mut AccountStore) {
-    let account_name = args.value_of("account").unwrap();
+    let account_name = args.get_one::<String>("account").unwrap();
     print!("Are you sure you want to delete {} [N/y]? ", account_name);
     io::stdout().flush().unwrap();
     let mut answer = String::new();
