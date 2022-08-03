@@ -33,7 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         rust:
-          - 1.56.1
+          - 1.57.0
           - stable
         os:
           - windows-latest
