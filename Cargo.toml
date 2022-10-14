@@ -13,7 +13,7 @@ description = "A Command Line OTP (One Time Password) Authenticator application.
 edition = "2018"
 
 [dependencies]
-clap = { version = "3.2.20", features = ["cargo", "wrap_help"] }
+clap = { version = "4.0.15", features = ["cargo", "wrap_help"] }
 ring = "0.16.20"
 data-encoding = "2.3.2"
 toml = "0.5.9"
