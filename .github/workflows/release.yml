@@ -18,6 +18,7 @@
 name: Release
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
@@ -40,8 +41,8 @@ jobs:
           # Apparently, this is the right way to get a tag name. Really?
           #
           # See: https://github.community/t5/GitHub-Actions/How-to-get-just-the-tag-name/m-p/32167/highlight/true#M1027
-          echo "CLOAK_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-          echo "version is: ${{ env.CLOAK_VERSION }}"
+          echo "CLOAK_VERSION=${{  github.ref_name }}" >> $GITHUB_ENV
+          echo "version is: ${{  github.ref_name }}"
       - name: Create GitHub release
         id: release
         uses: actions/create-release@v1
@@ -108,6 +109,7 @@ jobs:
         shell: bash
         run: |
           staging="cloak-${{ needs.create-release.outputs.cloak_version }}-${{ matrix.target }}"
+          mkdir "$staging"
           cp {README.md,LICENSE} "$staging/"
 
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
