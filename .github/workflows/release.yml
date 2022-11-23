@@ -109,6 +109,7 @@ jobs:
         shell: bash
         run: |
           staging="cloak-${{ needs.create-release.outputs.cloak_version }}-${{ matrix.target }}"
+          mkdir "$staging"
           cp {README.md,LICENSE} "$staging/"
 
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
