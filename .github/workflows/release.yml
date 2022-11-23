@@ -41,8 +41,8 @@ jobs:
           # Apparently, this is the right way to get a tag name. Really?
           #
           # See: https://github.community/t5/GitHub-Actions/How-to-get-just-the-tag-name/m-p/32167/highlight/true#M1027
-          echo "CLOAK_VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-          echo "version is: ${{ env.CLOAK_VERSION }}"
+          echo "CLOAK_VERSION=${{  github.ref_name }}" >> $GITHUB_ENV
+          echo "version is: ${{  github.ref_name }}"
       - name: Create GitHub release
         id: release
         uses: actions/create-release@v1
