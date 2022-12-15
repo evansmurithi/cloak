@@ -16,7 +16,7 @@ edition = "2018"
 clap = { version = "3.2.20", features = ["cargo", "wrap_help"] }
 ring = "0.16.20"
 data-encoding = "2.3.2"
-toml = "0.5.9"
+toml = "0.5.10"
 serde = "1.0.144"
 serde_derive = "1.0.119"
 dirs-next = "2.0.0"
