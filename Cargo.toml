@@ -20,7 +20,7 @@ toml = "0.5.9"
 serde = "1.0.144"
 serde_derive = "1.0.119"
 dirs-next = "2.0.0"
-thiserror = "1.0.34"
+thiserror = "1.0.38"
 lazy_static = "1.4.0"
 
 [dev-dependencies]
